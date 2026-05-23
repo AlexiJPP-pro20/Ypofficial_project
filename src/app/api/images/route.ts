@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 
-// Forzar a Next.js a que esta ruta sea dinámica.
-// De lo contrario, Next.js la compila de forma estática en el build y nunca
-// se conectaría a Cloudinary en tiempo real.
+// Forzar revalidación instantánea (no cachear en build time)
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 // Si existe CLOUDINARY_URL, el SDK de Cloudinary se configura automáticamente solo.
 // De lo contrario, configuramos usando las variables individuales.
@@ -21,7 +20,8 @@ if (process.env.CLOUDINARY_URL) {
   });
 }
 
-export async function GET() {
+// Al agregar el parámetro 'request', Next.js se ve obligado a compilar esta ruta como DYNAMIC (λ)
+export async function GET(request: Request) {
   try {
     const hasConfig = 
       process.env.CLOUDINARY_URL || 
