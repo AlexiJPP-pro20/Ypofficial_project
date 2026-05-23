@@ -22,7 +22,7 @@ export default function ImageCard({ image, priority = false }: ImageCardProps) {
 
   // Helper to generate WhatsApp URL with custom pre-filled message
   const getWhatsAppUrl = () => {
-    const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '573000000000';
+    const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '584262623818';
     const imgUrl = getImageUrl(image.src);
     const message = `¡Hola Ypofficial! Quisiera pedir esta prenda de su catálogo:
 - *Modelo:* ${image.alt}
