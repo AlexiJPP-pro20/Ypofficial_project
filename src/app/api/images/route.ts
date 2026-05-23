@@ -15,32 +15,31 @@ export async function GET() {
     const apiKey = process.env.CLOUDINARY_API_KEY;
     const apiSecret = process.env.CLOUDINARY_API_SECRET;
 
-    // Si no están configuradas las variables, devolvemos un array vacío con un aviso
     if (!cloudName || !apiKey || !apiSecret) {
       console.warn("⚠️ Advertencia: Variables de entorno de Cloudinary no configuradas.");
-      return NextResponse.json({ images: [], warning: "Falta configurar .env.local" });
+      return NextResponse.json({ images: [], warning: "Falta configurar las variables de entorno" });
     }
 
-    // Buscar todos los recursos en Cloudinary (imágenes)
-    // Usamos el Search API para poder buscar por carpetas y obtener metadatos.
-    // Buscamos recursos dentro de la carpeta 'ypofficial' (puedes cambiar este prefijo)
-    const result = await cloudinary.search
-      .expression('folder:ypofficial/* AND resource_type:image')
-      .sort_by('created_at', 'desc')
-      .max_results(500) // Soporta hasta 500 resultados por consulta
-      .execute();
+    // Usamos el API de Administración (Admin API) de recursos con prefijo,
+    // que es en tiempo real (no requiere que Cloudinary indexe la búsqueda)
+    const result = await cloudinary.api.resources({
+      type: 'upload',
+      prefix: 'ypofficial/',
+      max_results: 500,
+      tags: true,
+    });
 
     const resources = result.resources || [];
 
     // Mapear los recursos de Cloudinary a nuestra estructura CatalogImage
     const mappedImages = resources.map((resource: any, index: number) => {
-      const publicId = resource.public_id; // Ej: "ypofficial/mujeres/gorros-de-mono/foto1"
+      const publicId = resource.public_id; // Ej: "ypofficial/mujeres/gorros_de_moño/foto1"
       const parts = publicId.split('/');
 
       let category = 'Mujeres';
       let subcategory = 'Gorro Unisex';
 
-      // Estructura esperada: ["ypofficial", "mujeres|hombres", "gorros-de-mono|gorro-unisex", "nombre_archivo"]
+      // Estructura esperada: ["ypofficial", "mujeres|hombres", "gorros_de_moño|gorros_unisex", "nombre_archivo"]
       if (parts.length >= 3) {
         const catFolder = parts[1].toLowerCase();
         const subFolder = parts[2].toLowerCase();
@@ -66,10 +65,12 @@ export async function GET() {
         .replace(/[-_]/g, ' ')
         .replace(/\b\w/g, (char: string) => char.toUpperCase());
 
+      // Optimización de la URL de Cloudinary
+      const optimizedUrl = resource.secure_url.replace('/upload/', '/upload/f_auto,q_auto,w_600/');
+
       return {
         id: index + 1,
-        // Cloudinary ofrece URLs optimizadas reemplazando 'upload' por 'upload/f_auto,q_auto' (formato y calidad automática)
-        src: resource.secure_url.replace('/upload/', '/upload/f_auto,q_auto,w_600/'),
+        src: optimizedUrl,
         alt: cleanAlt,
         category,
         subcategory,
@@ -77,7 +78,6 @@ export async function GET() {
       };
     });
 
-    // Añadir encabezado para evitar almacenamiento en caché excesivo en producción
     return NextResponse.json(
       { images: mappedImages },
       {
