@@ -20,12 +20,27 @@ export default function ImageCard({ image, priority = false }: ImageCardProps) {
     return src;
   };
 
+  // Helper to clean leading IDs/numbers from display title (e.g. "01 - Gorro" -> "Gorro")
+  const getCleanTitle = (alt: string) => {
+    if (/^\d+$/.test(alt.trim())) {
+      return '';
+    }
+    return alt.replace(/^[\d\s\-_#]+/, '').trim();
+  };
+
+  const titleToDisplay = getCleanTitle(image.alt);
+
   // Helper to generate WhatsApp URL with custom pre-filled message
   const getWhatsAppUrl = () => {
     const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '584262623818';
     const imgUrl = getImageUrl(image.src);
+    
+    const modelLine = titleToDisplay 
+      ? `- *Modelo:* ${titleToDisplay}` 
+      : `- *Código:* ${image.alt}`;
+
     const message = `¡Hola Ypofficial! Quisiera pedir esta prenda de su catálogo:
-- *Modelo:* ${image.alt}
+${modelLine}
 - *Foto:* ${imgUrl}`;
 
     return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
@@ -85,13 +100,11 @@ export default function ImageCard({ image, priority = false }: ImageCardProps) {
           <span className="image-card__category">
             {image.category} • {image.subcategory}
           </span>
-          <h3 className="image-card__title" title={image.alt}>
-            {image.alt}
-          </h3>
-          <div className="image-card__tags">
-            <span className="image-card__tag-item">Color: <strong>{image.color}</strong></span>
-            {image.pattern && <span className="image-card__tag-item">Estilo: <strong>{image.pattern}</strong></span>}
-          </div>
+          {titleToDisplay && (
+            <h3 className="image-card__title" title={image.alt}>
+              {titleToDisplay}
+            </h3>
+          )}
         </div>
         <a
           href={getWhatsAppUrl()}
