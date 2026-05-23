@@ -1,27 +1,35 @@
 import { NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 
-// Configurar Cloudinary con variables de entorno
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-  secure: true,
-});
+// Si existe CLOUDINARY_URL, el SDK de Cloudinary se configura automáticamente solo.
+// De lo contrario, configuramos usando las variables individuales.
+if (process.env.CLOUDINARY_URL) {
+  cloudinary.config({
+    secure: true,
+  });
+} else {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+    secure: true,
+  });
+}
 
 export async function GET() {
   try {
-    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    const apiKey = process.env.CLOUDINARY_API_KEY;
-    const apiSecret = process.env.CLOUDINARY_API_SECRET;
+    const hasConfig = 
+      process.env.CLOUDINARY_URL || 
+      (process.env.CLOUDINARY_CLOUD_NAME && 
+       process.env.CLOUDINARY_API_KEY && 
+       process.env.CLOUDINARY_API_SECRET);
 
-    if (!cloudName || !apiKey || !apiSecret) {
+    if (!hasConfig) {
       console.warn("⚠️ Advertencia: Variables de entorno de Cloudinary no configuradas.");
       return NextResponse.json({ images: [], warning: "Falta configurar las variables de entorno" });
     }
 
-    // Usamos el API de Administración (Admin API) de recursos con prefijo,
-    // que es en tiempo real (no requiere que Cloudinary indexe la búsqueda)
+    // Usamos el API de Administración (Admin API) de recursos con prefijo
     const result = await cloudinary.api.resources({
       type: 'upload',
       prefix: 'ypofficial/',
