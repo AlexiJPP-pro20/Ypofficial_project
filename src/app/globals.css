@@ -614,44 +614,6 @@ img {
   filter: brightness(1.03);
 }
 
-.image-card__overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(92, 46, 122, 0.6) 0%,
-    transparent 60%
-  );
-  opacity: 0;
-  transition: opacity var(--duration-base) var(--ease);
-  display: flex;
-  align-items: flex-end;
-  padding: 16px;
-}
-
-.image-card:hover .image-card__overlay {
-  opacity: 1;
-}
-
-.image-card__meta {
-  color: var(--white);
-}
-
-.image-card__category {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--pink-light);
-  margin-bottom: 2px;
-}
-
-.image-card__alt {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--white);
-}
-
 .image-card__badge {
   position: absolute;
   top: 10px;
@@ -665,6 +627,98 @@ img {
   letter-spacing: 0.5px;
   backdrop-filter: blur(6px);
   border: 1px solid var(--border);
+  z-index: 10;
+}
+
+.image-card__content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+}
+
+.image-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.image-card__category {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--pink-main);
+}
+
+.image-card__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dark);
+  line-height: 1.4;
+  /* Prevent excessive text overflow */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 2.8em;
+}
+
+.image-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.image-card__tag-item {
+  font-size: 11px;
+  color: var(--text-mid);
+  background: var(--cream-dark);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-weight: 400;
+}
+
+.image-card__tag-item strong {
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.image-card__whatsapp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #25D366;
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all var(--duration-base) var(--ease);
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(37, 211, 102, 0.15);
+}
+
+.image-card__whatsapp-btn:hover {
+  background: #20ba5a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(37, 211, 102, 0.3);
+}
+
+.image-card__whatsapp-btn:active {
+  transform: translateY(0);
+}
+
+.image-card__whatsapp-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 
 /* === SKELETON LOADER === */
