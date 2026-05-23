@@ -29,25 +29,40 @@ export async function GET() {
       return NextResponse.json({ images: [], warning: "Falta configurar las variables de entorno" });
     }
 
-    // Usamos el API de Administración (Admin API) de recursos con prefijo
-    const result = await cloudinary.api.resources({
-      type: 'upload',
-      prefix: 'ypofficial/',
-      max_results: 500,
-      tags: true,
-    });
+    // Obtenemos todos los recursos de la cuenta usando paginación (soporta más de 500 imágenes)
+    let allResources: any[] = [];
+    let nextCursor: string | undefined = undefined;
 
-    const resources = result.resources || [];
+    do {
+      const options: any = {
+        type: 'upload',
+        max_results: 500,
+      };
+      if (nextCursor) {
+        options.next_cursor = nextCursor;
+      }
+      
+      const result = await cloudinary.api.resources(options);
+      if (result.resources) {
+        allResources = allResources.concat(result.resources);
+      }
+      nextCursor = result.next_cursor;
+    } while (nextCursor);
+
+    // Filtrar únicamente los recursos que pertenezcan a la carpeta 'ypofficial'
+    const filteredResources = allResources.filter(
+      (resource) => resource.asset_folder && resource.asset_folder.startsWith('ypofficial')
+    );
 
     // Mapear los recursos de Cloudinary a nuestra estructura CatalogImage
-    const mappedImages = resources.map((resource: any, index: number) => {
-      const publicId = resource.public_id; // Ej: "ypofficial/mujeres/gorros_de_moño/foto1"
-      const parts = publicId.split('/');
+    const mappedImages = filteredResources.map((resource: any, index: number) => {
+      const folderPath = resource.asset_folder || ''; // Ej: "ypofficial/mujeres/gorros_de_moño"
+      const parts = folderPath.split('/');
 
       let category = 'Mujeres';
       let subcategory = 'Gorro Unisex';
 
-      // Estructura esperada: ["ypofficial", "mujeres|hombres", "gorros_de_moño|gorros_unisex", "nombre_archivo"]
+      // Estructura esperada: ["ypofficial", "mujeres|hombres", "gorros_de_moño|gorros_unisex"]
       if (parts.length >= 3) {
         const catFolder = parts[1].toLowerCase();
         const subFolder = parts[2].toLowerCase();
@@ -67,8 +82,8 @@ export async function GET() {
         }
       }
 
-      // Generar una descripción alternativa limpia desde el nombre del archivo
-      const filename = parts[parts.length - 1] || 'Gorro Quirúrgico';
+      // Generar una descripción alternativa limpia desde el display_name o public_id
+      const filename = resource.display_name || resource.public_id || 'Gorro Quirúrgico';
       const cleanAlt = filename
         .replace(/[-_]/g, ' ')
         .replace(/\b\w/g, (char: string) => char.toUpperCase());
@@ -82,7 +97,7 @@ export async function GET() {
         alt: cleanAlt,
         category,
         subcategory,
-        tags: resource.tags || [category.toLowerCase(), subcategory.toLowerCase()],
+        tags: [category.toLowerCase(), subcategory.toLowerCase()],
       };
     });
 
