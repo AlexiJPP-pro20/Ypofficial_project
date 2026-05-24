@@ -373,9 +373,20 @@ export default function Home() {
           return src;
         };
         const getCleanTitle = (alt: string) => {
-          if (/^\d+$/.test(alt.trim())) {
+          const trimmed = alt.trim();
+          // Si es solo un número, no es un título real
+          if (/^\d+$/.test(trimmed)) {
             return '';
           }
+          // Si es un archivo temporal/genérico de WhatsApp
+          if (/^whatsapp\s+image/i.test(trimmed)) {
+            return '';
+          }
+          // Si empieza por IMG o IMAGE seguido de números o fechas
+          if (/^(img|image)[_\s-]*\d+/i.test(trimmed)) {
+            return '';
+          }
+
           let clean = alt.replace(/^[\d\s\-_#]+/, '').trim();
           const words = clean.split(' ');
           if (words.length > 1) {

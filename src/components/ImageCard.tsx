@@ -23,9 +23,20 @@ export default function ImageCard({ image, priority = false, onOpenLightbox }: I
 
   // Helper to clean leading IDs/numbers from display title (e.g. "01 - Gorro" -> "Gorro")
   const getCleanTitle = (alt: string) => {
-    if (/^\d+$/.test(alt.trim())) {
+    const trimmed = alt.trim();
+    // Si es solo un número, no es un título real
+    if (/^\d+$/.test(trimmed)) {
       return '';
     }
+    // Si es un archivo temporal/genérico de WhatsApp
+    if (/^whatsapp\s+image/i.test(trimmed)) {
+      return '';
+    }
+    // Si empieza por IMG o IMAGE seguido de números o fechas
+    if (/^(img|image)[_\s-]*\d+/i.test(trimmed)) {
+      return '';
+    }
+
     let clean = alt.replace(/^[\d\s\-_#]+/, '').trim();
     
     // Eliminar el sufijo hash de 6 caracteres alfanuméricos al final si aún existe
