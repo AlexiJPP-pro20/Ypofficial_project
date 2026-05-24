@@ -89,7 +89,12 @@ export async function GET(request: Request) {
 
       // Generar una descripción alternativa limpia desde el display_name o public_id
       const filename = resource.display_name || resource.public_id || 'Gorro Quirúrgico';
-      const cleanAlt = filename
+      const baseFilename = filename.split('/').pop() || filename;
+      
+      // Eliminar el sufijo hash de 6 caracteres alfanuméricos de Cloudinary (ej: _m0eavn o -m0eavn)
+      const filenameWithoutHash = baseFilename.replace(/[_-][a-zA-Z0-9]{6}$/, '');
+      
+      const cleanAlt = filenameWithoutHash
         .replace(/[-_]/g, ' ')
         .replace(/\b\w/g, (char: string) => char.toUpperCase());
 

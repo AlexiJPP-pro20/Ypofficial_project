@@ -6,9 +6,10 @@ import { CatalogImage } from '@/data/catalog';
 type ImageCardProps = {
   image: CatalogImage;
   priority?: boolean;
+  onOpenLightbox?: (image: CatalogImage) => void;
 };
 
-export default function ImageCard({ image, priority = false }: ImageCardProps) {
+export default function ImageCard({ image, priority = false, onOpenLightbox }: ImageCardProps) {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
 
@@ -25,7 +26,18 @@ export default function ImageCard({ image, priority = false }: ImageCardProps) {
     if (/^\d+$/.test(alt.trim())) {
       return '';
     }
-    return alt.replace(/^[\d\s\-_#]+/, '').trim();
+    let clean = alt.replace(/^[\d\s\-_#]+/, '').trim();
+    
+    // Eliminar el sufijo hash de 6 caracteres alfanuméricos al final si aún existe
+    const words = clean.split(' ');
+    if (words.length > 1) {
+      const lastWord = words[words.length - 1];
+      if (/^[a-zA-Z0-9]{6}$/.test(lastWord) && lastWord.toLowerCase() !== 'unisex') {
+        words.pop();
+        clean = words.join(' ');
+      }
+    }
+    return clean;
   };
 
   const titleToDisplay = getCleanTitle(image.alt);
@@ -53,7 +65,19 @@ ${modelLine}
         <span className="image-card__badge">{image.pattern}</span>
       )}
 
-      <div className="image-card__img-wrapper">
+      <div 
+        className="image-card__img-wrapper"
+        onClick={() => onOpenLightbox?.(image)}
+        role="button"
+        tabIndex={0}
+        aria-label={`Ver foto completa de ${titleToDisplay || 'gorro'}`}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onOpenLightbox?.(image);
+          }
+        }}
+      >
         {/* Skeleton while loading */}
         {!loaded && !error && (
           <div
