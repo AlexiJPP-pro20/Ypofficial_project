@@ -108,6 +108,7 @@ export async function GET(request: Request) {
         category,
         subcategory,
         tags: [category.toLowerCase(), subcategory.toLowerCase()],
+        createdAt: resource.created_at,
       };
     });
 

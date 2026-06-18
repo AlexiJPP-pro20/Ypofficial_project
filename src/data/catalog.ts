@@ -27,6 +27,8 @@ export type CatalogImage = {
   color: string;
   pattern: string; // Estampado, Liso, etc.
   tags: string[];
+  isNew?: boolean;
+  createdAt?: string;
 };
 
 export const CATEGORIES = [
@@ -77,6 +79,7 @@ export const catalogImages: CatalogImage[] = [
     color: "Rosa",
     pattern: "Flores",
     tags: ["flores", "rosa", "enfermera", "moño", "dama"],
+    createdAt: "2025-01-10T12:00:00Z",
   },
   {
     id: 2,
@@ -87,6 +90,7 @@ export const catalogImages: CatalogImage[] = [
     color: "Azul",
     pattern: "Liso",
     tags: ["azul", "liso", "cirujano", "clasico", "unisex"],
+    createdAt: "2025-02-15T12:00:00Z",
   },
   {
     id: 3,
@@ -97,6 +101,7 @@ export const catalogImages: CatalogImage[] = [
     color: "Celeste",
     pattern: "Profesiones",
     tags: ["odontologia", "celeste", "dentistas", "estampado", "unisex"],
+    createdAt: "2025-03-20T12:00:00Z",
   },
   {
     id: 4,
@@ -107,6 +112,7 @@ export const catalogImages: CatalogImage[] = [
     color: "Negro",
     pattern: "Estampado",
     tags: ["corazon", "electrocardiograma", "negro", "medico", "unisex"],
+    createdAt: "2025-04-25T12:00:00Z",
   },
   {
     id: 5,
@@ -117,6 +123,7 @@ export const catalogImages: CatalogImage[] = [
     color: "Morado",
     pattern: "Liso",
     tags: ["morado", "liso", "enfermeria", "moño", "dama"],
+    createdAt: "2025-05-01T12:00:00Z",
   },
   {
     id: 6,
@@ -127,6 +134,7 @@ export const catalogImages: CatalogImage[] = [
     color: "Multicolor",
     pattern: "Dibujos Animados",
     tags: ["gatos", "veterinaria", "huellas", "multicolor", "moño"],
+    createdAt: "2026-06-10T12:00:00Z",
   },
   {
     id: 7,
@@ -137,5 +145,6 @@ export const catalogImages: CatalogImage[] = [
     color: "Verde",
     pattern: "Liso",
     tags: ["verde", "liso", "cirugia", "clasico", "unisex"],
+    createdAt: "2026-06-15T12:00:00Z",
   }
 ];

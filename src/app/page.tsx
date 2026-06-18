@@ -31,6 +31,7 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<CatalogImage | null>(null);
+  const [sortBy, setSortBy] = useState<'recent' | 'category'>('recent');
 
   // Close lightbox on Escape key press and toggle body scroll lock
   useEffect(() => {
@@ -72,9 +73,9 @@ export default function Home() {
     fetchImages();
   }, []);
 
-  // Filter & search logic
+  // Filter, search & sorting logic
   const filtered = useMemo<CatalogImage[]>(() => {
-    return images.filter((img) => {
+    const result = images.filter((img) => {
       const matchesCategory =
         filters.category === 'Todos' || img.category === filters.category;
       const matchesSubcategory =
@@ -89,7 +90,31 @@ export default function Home() {
 
       return matchesCategory && matchesSubcategory && matchesSearch;
     });
-  }, [images, filters, search]);
+
+    if (sortBy === 'recent') {
+      return [...result].sort((a, b) => {
+        if (a.createdAt && b.createdAt) {
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        }
+        return b.id - a.id;
+      });
+    } else if (sortBy === 'category') {
+      return [...result].sort((a, b) => a.category.localeCompare(b.category));
+    }
+
+    return result;
+  }, [images, filters, search, sortBy]);
+
+  // Determine which images are "new" (e.g. the 6 most recent ones in the catalog)
+  const recentImageIds = useMemo(() => {
+    const sorted = [...images].sort((a, b) => {
+      if (a.createdAt && b.createdAt) {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+      return b.id - a.id;
+    });
+    return new Set(sorted.slice(0, 6).map((img) => img.id));
+  }, [images]);
 
   // Pagination
   const displayed = useMemo(() => filtered.slice(0, page * PAGE_SIZE), [filtered, page]);
@@ -262,8 +287,17 @@ export default function Home() {
 
             <div className="catalog__sort">
               <span className="catalog__sort-label">Ordenar:</span>
-              <select id="sort-select" className="catalog__sort-select" defaultValue="default" aria-label="Ordenar por">
-                <option value="default">Más recientes</option>
+              <select
+                id="sort-select"
+                className="catalog__sort-select"
+                value={sortBy}
+                onChange={(e) => {
+                  setSortBy(e.target.value as 'recent' | 'category');
+                  setPage(1);
+                }}
+                aria-label="Ordenar por"
+              >
+                <option value="recent">Más recientes</option>
                 <option value="category">Por categoría</option>
               </select>
             </div>
@@ -313,6 +347,7 @@ export default function Home() {
                       image={img} 
                       priority={idx < 8} 
                       onOpenLightbox={setSelectedImage}
+                      isNew={recentImageIds.has(img.id)}
                     />
                   </div>
                 ))}

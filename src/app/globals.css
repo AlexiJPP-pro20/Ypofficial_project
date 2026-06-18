@@ -631,6 +631,25 @@ img {
   z-index: 10;
 }
 
+.image-card__badge--new {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: linear-gradient(135deg, var(--pink-hot) 0%, var(--pink-main) 100%);
+  color: var(--white);
+  border-radius: var(--radius-full);
+  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(217, 79, 117, 0.4);
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .image-card__content {
   padding: 16px;
   display: flex;
