@@ -32,6 +32,8 @@ export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<CatalogImage | null>(null);
   const [sortBy, setSortBy] = useState<'recent' | 'category'>('recent');
+  const [bcvRate, setBcvRate] = useState<number | null>(null);
+  const [loadingRate, setLoadingRate] = useState(true);
 
   // Close lightbox on Escape key press and toggle body scroll lock
   useEffect(() => {
@@ -49,6 +51,25 @@ export default function Home() {
       document.body.style.overflow = '';
     };
   }, [selectedImage]);
+
+  // Fetch BCV exchange rate on mount
+  useEffect(() => {
+    async function fetchBcvRate() {
+      setLoadingRate(true);
+      try {
+        const res = await fetch('/api/bcv');
+        const data = await res.json();
+        if (data && data.current && data.current.usd) {
+          setBcvRate(data.current.usd);
+        }
+      } catch (error) {
+        console.error('Error fetching BCV rate client side:', error);
+      } finally {
+        setLoadingRate(false);
+      }
+    }
+    fetchBcvRate();
+  }, []);
 
   // Fetch images from Cloudinary API on mount
   useEffect(() => {
@@ -146,6 +167,13 @@ export default function Home() {
     search && { key: null, label: `"${search}"` },
   ].filter(Boolean) as { key: keyof Filters | null; label: string }[];
 
+  const formatBs = (value: number) => {
+    return value.toLocaleString('es-VE', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + ' Bs.';
+  };
+
   return (
     <>
       {/* ====== HEADER ====== */}
@@ -176,6 +204,13 @@ export default function Home() {
               aria-label="Buscar imágenes"
             />
           </div>
+
+          {/* BCV Dollar Rate */}
+          {bcvRate && (
+            <span className="header__rate" title="Tasa oficial del Banco Central de Venezuela (BCV)">
+              Tasa BCV: <strong>{formatBs(bcvRate)}</strong>
+            </span>
+          )}
 
           {/* Count */}
           <span className="header__count">
@@ -348,6 +383,7 @@ export default function Home() {
                       priority={idx < 8} 
                       onOpenLightbox={setSelectedImage}
                       isNew={recentImageIds.has(img.id)}
+                      bcvRate={bcvRate}
                     />
                   </div>
                 ))}
@@ -439,8 +475,13 @@ export default function Home() {
           ? `- *Modelo:* ${titleToDisplay}` 
           : `- *Código:* ${selectedImage.alt}`;
 
+        const priceLine = bcvRate
+          ? `- *Precio:* $2.00 (${formatBs(2 * bcvRate)})`
+          : `- *Precio:* $2.00`;
+
         const message = `¡Hola Ypofficial! Quisiera pedir esta prenda de su catálogo:
 ${modelLine}
+${priceLine}
 - *Foto:* ${imgUrl}`;
 
         const waUrl = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
@@ -491,6 +532,17 @@ ${modelLine}
                   <p className="lightbox__detail-item">
                     Disponibilidad inmediata para entrega. Confeccionado con telas suaves y resistentes, ideal para profesionales de la salud.
                   </p>
+                </div>
+
+                {/* Price display in Lightbox */}
+                <div className="lightbox__price-container">
+                  <span className="lightbox__price-label">Precio:</span>
+                  <div className="lightbox__price-values">
+                    <span className="lightbox__price-usd">$2.00 USD</span>
+                    {bcvRate && (
+                      <span className="lightbox__price-bs">({formatBs(2 * bcvRate)})</span>
+                    )}
+                  </div>
                 </div>
 
                 <a 

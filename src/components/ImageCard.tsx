@@ -8,9 +8,10 @@ type ImageCardProps = {
   priority?: boolean;
   onOpenLightbox?: (image: CatalogImage) => void;
   isNew?: boolean;
+  bcvRate?: number | null;
 };
 
-export default function ImageCard({ image, priority = false, onOpenLightbox, isNew = false }: ImageCardProps) {
+export default function ImageCard({ image, priority = false, onOpenLightbox, isNew = false, bcvRate }: ImageCardProps) {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
 
@@ -54,6 +55,13 @@ export default function ImageCard({ image, priority = false, onOpenLightbox, isN
 
   const titleToDisplay = getCleanTitle(image.alt);
 
+  const formatBs = (value: number) => {
+    return value.toLocaleString('es-VE', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + ' Bs.';
+  };
+
   // Helper to generate WhatsApp URL with custom pre-filled message
   const getWhatsAppUrl = () => {
     const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '584262623818';
@@ -63,8 +71,13 @@ export default function ImageCard({ image, priority = false, onOpenLightbox, isN
       ? `- *Modelo:* ${titleToDisplay}` 
       : `- *Código:* ${image.alt}`;
 
+    const priceLine = bcvRate
+      ? `- *Precio:* $2.00 (${formatBs(2 * bcvRate)})`
+      : `- *Precio:* $2.00`;
+
     const message = `¡Hola Ypofficial! Quisiera pedir esta prenda de su catálogo:
 ${modelLine}
+${priceLine}
 - *Foto:* ${imgUrl}`;
 
     return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
@@ -152,6 +165,15 @@ ${modelLine}
             </h3>
           )}
         </div>
+
+        {/* Price Row */}
+        <div className="image-card__price-row" aria-label="Precio del gorro">
+          <span className="image-card__price-usd">$2.00</span>
+          {bcvRate && (
+            <span className="image-card__price-bs">{formatBs(2 * bcvRate)}</span>
+          )}
+        </div>
+
         <a
           href={getWhatsAppUrl()}
           target="_blank"
