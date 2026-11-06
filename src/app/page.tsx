@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import FilterPanel from '@/components/FilterPanel';
 import ImageCard from '@/components/ImageCard';
+import { BsWhatsapp } from 'react-icons/bs';
 import {
   catalogImages as fallbackImages,
   CATEGORIES,
@@ -216,11 +217,28 @@ export default function Home() {
           <span className="header__count">
             <strong>{filtered.length}</strong> gorros
           </span>
+
+          {/* WhatsApp Header CTA */}
+          <a
+            href="https://wa.me/584146430116?text=Hola%20YP%20Modas%2C%20quisiera%20consultar%20el%20cat%C3%A1logo%20de%20gorros%20quir%C3%BArgicos."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="header__cta"
+            aria-label="Contactar por WhatsApp al +58 414-6430116"
+          >
+            <BsWhatsapp size={18} />
+            <span>WhatsApp</span>
+          </a>
         </div>
       </header>
 
       {/* ====== HERO ====== */}
       <section className="hero">
+        <div className="hero__bg" aria-hidden="true">
+          <img src="/Hero.jpg" alt="" className="hero__bg-img" />
+          <div className="hero__bg-overlay" />
+          <div className="hero__bg-fade" />
+        </div>
         <div className="hero__inner">
           <div className="hero__badge">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
@@ -235,6 +253,18 @@ export default function Home() {
             Explora nuestra colección de gorros para mujeres (moño y unisex) y hombres (unisex).
             Cómodos, lavables y con diseños exclusivos para profesionales de la salud.
           </p>
+          <div className="hero__actions">
+            <a
+              href="https://wa.me/584146430116?text=Hola%20YP%20Modas%2C%20quisiera%20m%C3%A1s%20informaci%C3%B3n%20sobre%20los%20gorros%20quir%C3%BArgicos."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hero__cta"
+              id="hero-cta-btn"
+            >
+              <BsWhatsapp size={20} />
+              <span>Hacer Pedido (+58 414-6430116)</span>
+            </a>
+          </div>
         </div>
       </section>
 
@@ -430,13 +460,24 @@ export default function Home() {
       {/* ====== FOOTER ====== */}
       <footer className="footer">
         <div className="footer__divider" />
-        <p>© 2025 <strong>YP Modas</strong> · Confeccionado con ❤️</p>
+        <p>© 2025 <strong>YP Modas</strong></p>
+        <p style={{ marginTop: 6, fontSize: 13 }}>
+          Contacto WhatsApp:{' '}
+          <a
+            href="https://wa.me/584146430116"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: 'var(--purple-main)', fontWeight: 600, textDecoration: 'underline' }}
+          >
+            +58 414-6430116
+          </a>
+        </p>
         <p style={{ marginTop: 4, fontSize: 12 }}>Todos los derechos reservados</p>
       </footer>
 
       {/* ====== LIGHTBOX MODAL ====== */}
       {selectedImage && (() => {
-        const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '584262623818';
+        const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '584146430116';
         const getImageUrl = (src: string) => {
           if (typeof window !== 'undefined' && src.startsWith('/')) {
             return `${window.location.origin}${src}`;
@@ -551,13 +592,7 @@ ${priceLine}
                   rel="noopener noreferrer"
                   className="lightbox__whatsapp-btn"
                 >
-                  <svg
-                    className="lightbox__whatsapp-icon"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.97C16.579 1.968 14.12 .94 11.5 1.056c-5.433 0-9.858 4.37-9.862 9.8.001 1.779.467 3.514 1.353 5.05L2.002 22l6.23-1.63c-1.554.856-3.18 1.484-1.585.784zm11.23-6.223c.302-.15.302-.45.051-.602-.251-.151-1.488-.732-1.718-.815-.23-.084-.397-.125-.565.125-.167.25-.646.815-.793.982-.147.166-.293.188-.595.037-.302-.15-1.274-.469-2.427-1.494-.897-.798-1.502-1.784-1.678-2.086-.176-.302-.019-.465.132-.615.136-.135.302-.35.453-.526.151-.176.201-.302.302-.503.101-.201.05-.377-.025-.526-.076-.15-1.02-2.464-1.397-3.37-.367-.887-.74-1.058-1.022-1.058-.282-.001-.565-.001-.847.001-.282 0-.74.106-1.127.525-.388.419-1.483 1.45-1.483 3.535 0 2.086 1.517 4.099 1.727 4.381.21.282 2.986 4.56 7.234 6.39.135.059.268.118.397.17.659.208 1.258.179 1.731.108.528-.079 1.62-.662 1.848-1.3.228-.638.228-1.186.16-1.3-.069-.113-.254-.18-.557-.33z" />
-                  </svg>
+                  <BsWhatsapp className="lightbox__whatsapp-icon" size={18} style={{ marginRight: 8 }} />
                   Pedir por WhatsApp
                 </a>
               </div>
@@ -565,6 +600,18 @@ ${priceLine}
           </div>
         );
       })()}
+
+      {/* ====== FLOATING WHATSAPP CTA ====== */}
+      <a
+        href="https://wa.me/584146430116?text=Hola%20YP%20Modas%2C%20quisiera%20m%C3%A1s%20informaci%C3%B3n%20sobre%20los%20gorros%20quir%C3%BArgicos."
+        target="_blank"
+        rel="noopener noreferrer"
+        className="floating-whatsapp"
+        aria-label="Contactar por WhatsApp al +58 414-6430116"
+        id="floating-whatsapp-btn"
+      >
+        <BsWhatsapp size={30} />
+      </a>
     </>
   );
 }
