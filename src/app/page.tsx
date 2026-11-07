@@ -209,14 +209,9 @@ export default function Home() {
           {/* BCV Dollar Rate */}
           {bcvRate && (
             <span className="header__rate" title="Tasa oficial del Banco Central de Venezuela (BCV)">
-              Tasa BCV: <strong>{formatBs(bcvRate)}</strong>
+              <span className="header__rate-label">Tasa BCV:</span> <strong>{formatBs(bcvRate)}</strong>
             </span>
           )}
-
-          {/* Count */}
-          <span className="header__count">
-            <strong>{filtered.length}</strong> gorros
-          </span>
 
           {/* WhatsApp Header CTA */}
           <a
@@ -224,7 +219,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
             className="header__cta"
-            aria-label="Contactar por WhatsApp al +58 414-6430116"
+            aria-label="Contactar por WhatsApp"
           >
             <BsWhatsapp size={18} />
             <span>WhatsApp</span>
@@ -242,7 +237,7 @@ export default function Home() {
         <div className="hero__inner">
           <div className="hero__badge">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
             </svg>
             Colección Quirúrgica 2025
           </div>
@@ -250,7 +245,7 @@ export default function Home() {
             Gorros <em>Quirúrgicos</em><br />de Alta Calidad
           </h1>
           <p className="hero__description">
-            Explora nuestra colección de gorros para mujeres (moño y unisex) y hombres (unisex).
+            Explora nuestra colección de gorros para damas y caballeros.
             Cómodos, lavables y con diseños exclusivos para profesionales de la salud.
           </p>
           <div className="hero__actions">
@@ -262,7 +257,7 @@ export default function Home() {
               id="hero-cta-btn"
             >
               <BsWhatsapp size={20} />
-              <span>Hacer Pedido (+58 414-6430116)</span>
+              <span>Contactanos!</span>
             </a>
           </div>
         </div>
@@ -304,10 +299,10 @@ export default function Home() {
         </div>
 
         {/* Catalog section */}
-        <section style={{ flex: 1, minWidth: 0 }}>
+        <section className="catalog">
           {/* Toolbar */}
           <div className="catalog__toolbar">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div className="catalog__toolbar-left">
               {/* Mobile filter button */}
               <button
                 id="mobile-filter-btn"
@@ -316,24 +311,13 @@ export default function Home() {
                 aria-label="Abrir filtros"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <line x1="4" y1="6" x2="20" y2="6"/>
-                  <line x1="8" y1="12" x2="16" y2="12"/>
-                  <line x1="10" y1="18" x2="14" y2="18"/>
+                  <line x1="4" y1="6" x2="20" y2="6" />
+                  <line x1="8" y1="12" x2="16" y2="12" />
+                  <line x1="10" y1="18" x2="14" y2="18" />
                 </svg>
-                Filtros
+                <span>Filtros</span>
                 {activeFilterTags.length > 0 && (
-                  <span style={{
-                    background: 'var(--purple-main)',
-                    color: 'white',
-                    borderRadius: '50%',
-                    width: 18,
-                    height: 18,
-                    fontSize: 10,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 700,
-                  }}>
+                  <span className="filter-mobile-toggle__badge">
                     {activeFilterTags.length}
                   </span>
                 )}
@@ -408,9 +392,9 @@ export default function Home() {
               <div className="image-grid" role="list" aria-label="Catálogo de gorros">
                 {displayed.map((img, idx) => (
                   <div key={img.id} role="listitem">
-                    <ImageCard 
-                      image={img} 
-                      priority={idx < 8} 
+                    <ImageCard
+                      image={img}
+                      priority={idx < 8}
                       onOpenLightbox={setSelectedImage}
                       isNew={recentImageIds.has(img.id)}
                       bcvRate={bcvRate}
@@ -428,9 +412,9 @@ export default function Home() {
                     onClick={() => setPage((p) => p + 1)}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                      <polyline points="7 10 12 15 17 10"/>
-                      <line x1="12" y1="15" x2="12" y2="3"/>
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
                     </svg>
                     Ver más gorros ({filtered.length - displayed.length} restantes)
                   </button>
@@ -447,8 +431,8 @@ export default function Home() {
               </p>
               <button className="empty-state__btn" onClick={handleClear}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <polyline points="1 4 1 10 7 10"/>
-                  <path d="M3.51 15a9 9 0 1 0 .49-3.51"/>
+                  <polyline points="1 4 1 10 7 10" />
+                  <path d="M3.51 15a9 9 0 1 0 .49-3.51" />
                 </svg>
                 Ver todos los gorros
               </button>
@@ -462,15 +446,6 @@ export default function Home() {
         <div className="footer__divider" />
         <p>© 2025 <strong>YP Modas</strong></p>
         <p style={{ marginTop: 6, fontSize: 13 }}>
-          Contacto WhatsApp:{' '}
-          <a
-            href="https://wa.me/584146430116"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: 'var(--purple-main)', fontWeight: 600, textDecoration: 'underline' }}
-          >
-            +58 414-6430116
-          </a>
         </p>
         <p style={{ marginTop: 4, fontSize: 12 }}>Todos los derechos reservados</p>
       </footer>
@@ -512,8 +487,8 @@ export default function Home() {
         };
         const titleToDisplay = getCleanTitle(selectedImage.alt);
         const imgUrl = getImageUrl(selectedImage.src);
-        const modelLine = titleToDisplay 
-          ? `- *Modelo:* ${titleToDisplay}` 
+        const modelLine = titleToDisplay
+          ? `- *Modelo:* ${titleToDisplay}`
           : `- *Código:* ${selectedImage.alt}`;
 
         const priceLine = bcvRate
@@ -528,16 +503,16 @@ ${priceLine}
         const waUrl = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 
         return (
-          <div 
-            className="lightbox" 
+          <div
+            className="lightbox"
             onClick={() => setSelectedImage(null)}
             role="dialog"
             aria-modal="true"
             aria-label="Vista detallada del gorro"
           >
             <div className="lightbox__card" onClick={(e) => e.stopPropagation()}>
-              <button 
-                className="lightbox__close-btn" 
+              <button
+                className="lightbox__close-btn"
                 onClick={() => setSelectedImage(null)}
                 aria-label="Cerrar vista completa"
               >
@@ -545,10 +520,10 @@ ${priceLine}
               </button>
 
               <div className="lightbox__image-container">
-                <img 
-                  src={selectedImage.src} 
-                  alt={selectedImage.alt} 
-                  className="lightbox__img" 
+                <img
+                  src={selectedImage.src}
+                  alt={selectedImage.alt}
+                  className="lightbox__img"
                 />
               </div>
 
@@ -586,7 +561,7 @@ ${priceLine}
                   </div>
                 </div>
 
-                <a 
+                <a
                   href={waUrl}
                   target="_blank"
                   rel="noopener noreferrer"
