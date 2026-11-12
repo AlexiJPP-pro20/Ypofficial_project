@@ -3,7 +3,11 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import FilterPanel from '@/components/FilterPanel';
 import ImageCard from '@/components/ImageCard';
-import { BsWhatsapp, BsFire, BsLightningChargeFill, BsPercent, BsStars } from 'react-icons/bs';
+import OrderSummaryBar from '@/components/OrderSummaryBar';
+import { useCart } from '@/context/CartContext';
+import { calculatePricingMetrics } from '@/config/pricing';
+import { buildSingleItemWhatsAppUrl, formatBs, getCleanTitle } from '@/utils/whatsapp';
+import { BsWhatsapp, BsFire, BsLightningChargeFill, BsPercent, BsStars, BsBagPlus } from 'react-icons/bs';
 import {
   catalogImages as fallbackImages,
   CATEGORIES,
@@ -25,6 +29,8 @@ const DEFAULT_FILTERS: Filters = {
 };
 
 export default function Home() {
+  const { totalUnits, addItem, updateQuantity, getItemQuantity } = useCart();
+  const pricing = calculatePricingMetrics();
   const [images, setImages] = useState<CatalogImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
@@ -168,30 +174,25 @@ export default function Home() {
     search && { key: null, label: `"${search}"` },
   ].filter(Boolean) as { key: keyof Filters | null; label: string }[];
 
-  const formatBs = (value: number) => {
-    return value.toLocaleString('es-VE', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }) + ' Bs.';
-  };
-
   return (
     <>
       {/* ====== TOP PROMO BAR ====== */}
-      <div className="top-bar" role="region" aria-label="Oferta especial">
-        <div className="top-bar__inner">
-          <span className="top-bar__promo-pill">
-            <BsFire size={13} />
-            25% OFF
-          </span>
-          <span className="top-bar__promo-text">
-            <BsStars className="top-bar__icon" size={15} />
-            25% DE DESCUENTO A PARTIR DE 12 UNIDADES: DE $2.00 A $1.50 C/U
-            {bcvRate ? ` (${formatBs(1.5 * bcvRate)})` : ''}
-            <BsLightningChargeFill className="top-bar__icon" size={14} />
-          </span>
+      {pricing.promoActive && (
+        <div className="top-bar" role="region" aria-label="Oferta especial">
+          <div className="top-bar__inner">
+            <span className="top-bar__promo-pill">
+              <BsFire size={13} />
+              {pricing.discountPercent}% OFF
+            </span>
+            <span className="top-bar__promo-text">
+              <BsStars className="top-bar__icon" size={15} />
+              {pricing.discountPercent}% DE DESCUENTO A PARTIR DE {pricing.wholesaleMinUnits} UNIDADES: DE ${pricing.unitPriceUSD.toFixed(2)} A ${pricing.wholesalePriceUSD.toFixed(2)} C/U
+              {bcvRate ? ` (${formatBs(pricing.wholesalePriceUSD * bcvRate)})` : ''}
+              <BsLightningChargeFill className="top-bar__icon" size={14} />
+            </span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ====== HEADER ====== */}
       <header className="header">
@@ -264,25 +265,27 @@ export default function Home() {
             Explora nuestra colección de gorros para damas y caballeros.
             Cómodos, lavables y con diseños exclusivos para profesionales de la salud.
           </p>
-          <div className="hero__promo-banner">
-            <span className="hero__promo-ribbon">
-              <BsFire size={13} />
-              OFERTA MAYORISTA EXCLUSIVA
-              <BsLightningChargeFill size={13} />
-            </span>
-            <span className="hero__promo-highlight">
-              <BsStars className="hero__promo-icon" size={20} />
-              25% DE DESCUENTO A PARTIR DE 12 UNIDADES
-              <BsPercent className="hero__promo-icon" size={20} />
-            </span>
-            <div className="hero__promo-details">
-              <span>De <span className="hero__promo-old-price">$2.00 c/u</span> a</span>
-              <span className="hero__promo-new-price">$1.50 c/u</span>
-              {bcvRate && (
-                <span className="hero__promo-bs">({formatBs(1.5 * bcvRate)})</span>
-              )}
+          {pricing.promoActive && (
+            <div className="hero__promo-banner">
+              <span className="hero__promo-ribbon">
+                <BsFire size={13} />
+                OFERTA MAYORISTA EXCLUSIVA
+                <BsLightningChargeFill size={13} />
+              </span>
+              <span className="hero__promo-highlight">
+                <BsStars className="hero__promo-icon" size={20} />
+                {pricing.discountPercent}% DE DESCUENTO A PARTIR DE {pricing.wholesaleMinUnits} UNIDADES
+                <BsPercent className="hero__promo-icon" size={20} />
+              </span>
+              <div className="hero__promo-details">
+                <span>De <span className="hero__promo-old-price">${pricing.unitPriceUSD.toFixed(2)} c/u</span> a</span>
+                <span className="hero__promo-new-price">${pricing.wholesalePriceUSD.toFixed(2)} c/u</span>
+                {bcvRate && (
+                  <span className="hero__promo-bs">({formatBs(pricing.wholesalePriceUSD * bcvRate)})</span>
+                )}
+              </div>
             </div>
-          </div>
+          )}
           <div className="hero__actions">
             <a
               href="https://wa.me/584146430116?text=Hola%20YP%20Modas%2C%20quisiera%20m%C3%A1s%20informaci%C3%B3n%20sobre%20los%20gorros%20quir%C3%BArgicos."
@@ -487,55 +490,9 @@ export default function Home() {
 
       {/* ====== LIGHTBOX MODAL ====== */}
       {selectedImage && (() => {
-        const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '584146430116';
-        const getImageUrl = (src: string) => {
-          if (typeof window !== 'undefined' && src.startsWith('/')) {
-            return `${window.location.origin}${src}`;
-          }
-          return src;
-        };
-        const getCleanTitle = (alt: string) => {
-          const trimmed = alt.trim();
-          // Si es solo un número, no es un título real
-          if (/^\d+$/.test(trimmed)) {
-            return '';
-          }
-          // Si es un archivo temporal/genérico de WhatsApp
-          if (/^whatsapp\s+image/i.test(trimmed)) {
-            return '';
-          }
-          // Si empieza por IMG o IMAGE seguido de números o fechas
-          if (/^(img|image)[_\s-]*\d+/i.test(trimmed)) {
-            return '';
-          }
-
-          let clean = alt.replace(/^[\d\s\-_#]+/, '').trim();
-          const words = clean.split(' ');
-          if (words.length > 1) {
-            const lastWord = words[words.length - 1];
-            if (/^[a-zA-Z0-9]{6}$/.test(lastWord) && lastWord.toLowerCase() !== 'unisex') {
-              words.pop();
-              clean = words.join(' ');
-            }
-          }
-          return clean;
-        };
         const titleToDisplay = getCleanTitle(selectedImage.alt);
-        const imgUrl = getImageUrl(selectedImage.src);
-        const modelLine = titleToDisplay
-          ? `- *Modelo:* ${titleToDisplay}`
-          : `- *Código:* ${selectedImage.alt}`;
-
-        const priceLine = bcvRate
-          ? `- *Precio unitario:* $2.00 (${formatBs(2 * bcvRate)})\n- *Oferta (12+ uds - 25% OFF):* $1.50 c/u (${formatBs(1.5 * bcvRate)})`
-          : `- *Precio unitario:* $2.00\n- *Oferta (12+ uds - 25% OFF):* $1.50 c/u`;
-
-        const message = `¡Hola Ypofficial! Quisiera pedir esta prenda de su catálogo:
-${modelLine}
-${priceLine}
-- *Foto:* ${imgUrl}`;
-
-        const waUrl = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+        const waUrl = buildSingleItemWhatsAppUrl(selectedImage, bcvRate, pricing.whatsappNumber);
+        const qtyInCart = getItemQuantity(selectedImage.id);
 
         return (
           <div
@@ -590,53 +547,93 @@ ${priceLine}
                   <div className="lightbox__price-tier">
                     <span className="lightbox__price-label">Precio Unitario:</span>
                     <div className="lightbox__price-values">
-                      <span className="lightbox__price-usd">$2.00 USD c/u</span>
+                      <span className="lightbox__price-usd">${pricing.unitPriceUSD.toFixed(2)} USD c/u</span>
                       {bcvRate && (
-                        <span className="lightbox__price-bs">({formatBs(2 * bcvRate)})</span>
+                        <span className="lightbox__price-bs">({formatBs(pricing.unitPriceUSD * bcvRate)})</span>
                       )}
                     </div>
                   </div>
-                  <div className="lightbox__price-tier lightbox__price-tier--wholesale">
-                    <div className="lightbox__wholesale-header">
-                      <span className="lightbox__price-label">
-                        <BsFire size={15} />
-                        25% de descuento a partir de 12 unidades:
-                      </span>
-                      <span className="lightbox__discount-badge">
-                        <BsLightningChargeFill size={11} />
-                        -25% OFF
-                      </span>
+                  {pricing.promoActive && (
+                    <div className="lightbox__price-tier lightbox__price-tier--wholesale">
+                      <div className="lightbox__wholesale-header">
+                        <span className="lightbox__price-label">
+                          <BsFire size={15} />
+                          {pricing.discountPercent}% de descuento a partir de {pricing.wholesaleMinUnits} unidades:
+                        </span>
+                        <span className="lightbox__discount-badge">
+                          <BsLightningChargeFill size={11} />
+                          -{pricing.discountPercent}% OFF
+                        </span>
+                      </div>
+                      <div className="lightbox__price-values">
+                        <span className="lightbox__price-usd lightbox__price-usd--promo">
+                          ${pricing.wholesalePriceUSD.toFixed(2)} USD c/u
+                        </span>
+                        {bcvRate && (
+                          <span className="lightbox__price-bs">
+                            ({formatBs(pricing.wholesalePriceUSD * bcvRate)})
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div className="lightbox__price-values">
-                      <span className="lightbox__price-usd lightbox__price-usd--promo">$1.50 USD c/u</span>
-                      {bcvRate && (
-                        <span className="lightbox__price-bs">({formatBs(1.5 * bcvRate)})</span>
-                      )}
-                    </div>
-                  </div>
+                  )}
                 </div>
 
-                <a
-                  href={waUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="lightbox__whatsapp-btn"
-                >
-                  <BsWhatsapp className="lightbox__whatsapp-icon" size={18} style={{ marginRight: 8 }} />
-                  Pedir por WhatsApp
-                </a>
+                <div className="lightbox__actions">
+                  {qtyInCart === 0 ? (
+                    <button
+                      type="button"
+                      className="lightbox__cart-btn"
+                      onClick={() => addItem(selectedImage, 1)}
+                    >
+                      <BsBagPlus size={18} />
+                      Añadir al pedido
+                    </button>
+                  ) : (
+                    <div className="lightbox__qty-control">
+                      <button
+                        type="button"
+                        onClick={() => updateQuantity(selectedImage.id, qtyInCart - 1)}
+                        aria-label="Restar unidad"
+                      >
+                        -
+                      </button>
+                      <span>{qtyInCart} en pedido</span>
+                      <button
+                        type="button"
+                        onClick={() => updateQuantity(selectedImage.id, qtyInCart + 1)}
+                        aria-label="Sumar unidad"
+                      >
+                        +
+                      </button>
+                    </div>
+                  )}
+
+                  <a
+                    href={waUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="lightbox__whatsapp-btn"
+                  >
+                    <BsWhatsapp className="lightbox__whatsapp-icon" size={18} style={{ marginRight: 8 }} />
+                    Pedir por WhatsApp
+                  </a>
+                </div>
               </div>
             </div>
           </div>
         );
       })()}
 
+      {/* ====== ORDER SUMMARY BAR ====== */}
+      <OrderSummaryBar bcvRate={bcvRate} />
+
       {/* ====== FLOATING WHATSAPP CTA ====== */}
       <a
-        href="https://wa.me/584146430116?text=Hola%20YP%20Modas%2C%20quisiera%20m%C3%A1s%20informaci%C3%B3n%20sobre%20los%20gorros%20quir%C3%BArgicos."
+        href={`https://wa.me/${pricing.whatsappNumber}?text=Hola%20YP%20Modas%2C%20quisiera%20m%C3%A1s%20informaci%C3%B3n%20sobre%20los%20gorros%20quir%C3%BArgicos.`}
         target="_blank"
         rel="noopener noreferrer"
-        className="floating-whatsapp"
+        className={`floating-whatsapp ${totalUnits > 0 ? 'floating-whatsapp--shifted' : ''}`}
         aria-label="Contactar por WhatsApp al +58 414-6430116"
         id="floating-whatsapp-btn"
       >

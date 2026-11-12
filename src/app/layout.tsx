@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
+import { CartProvider } from "@/context/CartContext";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -34,7 +35,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className={poppins.variable}>
-      <body>{children}</body>
+      <body>
+        <CartProvider>{children}</CartProvider>
+      </body>
     </html>
   );
 }

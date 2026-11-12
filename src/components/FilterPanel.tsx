@@ -99,25 +99,27 @@ export default function FilterPanel({
         </div>
       </div>
 
-      {/* Subcategory */}
-      <div className="filter-section">
-        <div className="filter-section__label">Modelo / Tipo</div>
-        <div className="filter-options">
-          {availableSubcategories.map((sub) => (
-            <button
-              key={sub}
-              className={`filter-option ${filters.subcategory === sub ? 'active' : ''}`}
-              onClick={() => onFilterChange('subcategory', sub)}
-            >
-              <span className="filter-option__dot" />
-              <span className="filter-option__name">{sub}</span>
-              <span className="filter-option__count">
-                {getCount(images, 'subcategory', sub, filters)}
-              </span>
-            </button>
-          ))}
+      {/* Subcategory: se oculta si solo existe un único modelo disponible */}
+      {availableSubcategories && availableSubcategories.filter((s) => s !== 'Todos').length > 1 && (
+        <div className="filter-section">
+          <div className="filter-section__label">Modelo / Tipo</div>
+          <div className="filter-options">
+            {availableSubcategories.map((sub) => (
+              <button
+                key={sub}
+                className={`filter-option ${filters.subcategory === sub ? 'active' : ''}`}
+                onClick={() => onFilterChange('subcategory', sub)}
+              >
+                <span className="filter-option__dot" />
+                <span className="filter-option__name">{sub}</span>
+                <span className="filter-option__count">
+                  {getCount(images, 'subcategory', sub, filters)}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

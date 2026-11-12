@@ -54,47 +54,59 @@ export async function GET(request: Request) {
       nextCursor = result.next_cursor;
     } while (nextCursor);
 
-    // Filtrar únicamente los recursos que pertenezcan a la carpeta 'ypofficial'
-    const filteredResources = allResources.filter(
-      (resource) => resource.asset_folder && resource.asset_folder.startsWith('ypofficial')
-    );
+    // Filtrar recursos que pertenezcan a 'ypofficial' y excluir 'gorros_unisex'
+    const filteredResources = allResources.filter((resource) => {
+      const folder = (resource.asset_folder || resource.folder || '').toLowerCase();
+      const publicId = (resource.public_id || '').toLowerCase();
+
+      // Exclusión estricta de la carpeta eliminada 'gorros_unisex'
+      if (folder.includes('gorros_unisex') || publicId.includes('gorros_unisex')) {
+        return false;
+      }
+
+      return (
+        folder.startsWith('ypofficial') ||
+        folder.includes('gorros_de_moño') ||
+        folder.includes('gorros_de_mono') ||
+        publicId.startsWith('ypofficial') ||
+        publicId.includes('gorros_de_moño') ||
+        publicId.includes('gorros_de_mono')
+      );
+    });
 
     // Mapear los recursos de Cloudinary a nuestra estructura CatalogImage
     const mappedImages = filteredResources.map((resource: any, index: number) => {
-      const folderPath = resource.asset_folder || ''; // Ej: "ypofficial/mujeres/gorros_de_moño"
-      const parts = folderPath.split('/');
+      // Obtener el nombre del archivo base sin carpetas
+      const rawName = resource.display_name || resource.public_id || 'Gorro';
+      const baseFilename = rawName.split('/').pop() || rawName;
+      
+      // Eliminar el sufijo hash generado por Cloudinary (ej: mujer_01_m0eavn o mujer_01-m0eavn)
+      const filenameWithoutHash = baseFilename.replace(/[_-][a-zA-Z0-9]{6}$/, '');
+      // Quitar extensión de archivo si viene incluida (.jpg, .png, etc.)
+      const cleanName = filenameWithoutHash.replace(/\.[^/.]+$/, '');
+      const lowerClean = cleanName.toLowerCase();
 
+      // Mapear Categoría según el prefijo/nombre del archivo (mujer_xx -> Mujeres, hombre_xx -> Hombres)
       let category = 'Mujeres';
-      let subcategory = 'Gorro Unisex';
-
-      // Estructura esperada: ["ypofficial", "mujeres|hombres", "gorros_de_moño|gorros_unisex"]
-      if (parts.length >= 3) {
-        const catFolder = parts[1].toLowerCase();
-        const subFolder = parts[2].toLowerCase();
-
-        // Mapear Categoría
-        if (catFolder === 'hombres' || catFolder === 'caballeros') {
+      if (lowerClean.startsWith('hombre') || lowerClean.includes('hombre')) {
+        category = 'Hombres';
+      } else if (lowerClean.startsWith('mujer') || lowerClean.includes('mujer')) {
+        category = 'Mujeres';
+      } else {
+        // Fallback por nombre de carpeta si aplica
+        const folderPath = (resource.asset_folder || resource.folder || '').toLowerCase();
+        if (folderPath.includes('hombre') || folderPath.includes('caballero')) {
           category = 'Hombres';
         } else {
           category = 'Mujeres';
         }
-
-        // Mapear Subcategoría
-        if (subFolder.includes('mono') || subFolder.includes('moño')) {
-          subcategory = 'Gorros de Moño';
-        } else {
-          subcategory = 'Gorro Unisex';
-        }
       }
 
-      // Generar una descripción alternativa limpia desde el display_name o public_id
-      const filename = resource.display_name || resource.public_id || 'Gorro Quirúrgico';
-      const baseFilename = filename.split('/').pop() || filename;
-      
-      // Eliminar el sufijo hash de 6 caracteres alfanuméricos de Cloudinary (ej: _m0eavn o -m0eavn)
-      const filenameWithoutHash = baseFilename.replace(/[_-][a-zA-Z0-9]{6}$/, '');
-      
-      const cleanAlt = filenameWithoutHash
+      // La única carpeta/modelo activa es gorros_de_moño
+      const subcategory = 'Gorros de Moño';
+
+      // Título limpio para mostrar en la tarjeta (ej: "Mujer 01", "Hombre 02")
+      const cleanAlt = cleanName
         .replace(/[-_]/g, ' ')
         .replace(/\b\w/g, (char: string) => char.toUpperCase());
 
@@ -107,7 +119,7 @@ export async function GET(request: Request) {
         alt: cleanAlt,
         category,
         subcategory,
-        tags: [category.toLowerCase(), subcategory.toLowerCase()],
+        tags: [category.toLowerCase(), 'gorros de moño', cleanName.toLowerCase()],
         createdAt: resource.created_at,
       };
     });

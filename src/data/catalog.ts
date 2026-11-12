@@ -38,9 +38,9 @@ export const CATEGORIES = [
 ];
 
 export const SUBCATEGORIES: Record<string, string[]> = {
-  "Todos": ["Todos", "Gorros de Moño", "Gorro Unisex"],
-  "Mujeres": ["Todos", "Gorros de Moño", "Gorro Unisex"],
-  "Hombres": ["Todos", "Gorro Unisex"]
+  "Todos": ["Todos", "Gorros de Moño"],
+  "Mujeres": ["Todos", "Gorros de Moño"],
+  "Hombres": ["Todos", "Gorros de Moño"]
 };
 
 export const PATTERNS = [
@@ -84,34 +84,34 @@ export const catalogImages: CatalogImage[] = [
   {
     id: 2,
     src: "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=600&q=80",
-    alt: "Gorro Quirúrgico Unisex - Azul Marino Clásico",
+    alt: "Hombre 01",
     category: "Hombres",
-    subcategory: "Gorro Unisex",
+    subcategory: "Gorros de Moño",
     color: "Azul",
     pattern: "Liso",
-    tags: ["azul", "liso", "cirujano", "clasico", "unisex"],
+    tags: ["azul", "liso", "cirujano", "clasico", "hombre"],
     createdAt: "2025-02-15T12:00:00Z",
   },
   {
     id: 3,
     src: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&q=80",
-    alt: "Gorro Quirúrgico Unisex - Dentistas e Instrumental Celeste",
+    alt: "Mujer 02",
     category: "Mujeres",
-    subcategory: "Gorro Unisex",
+    subcategory: "Gorros de Moño",
     color: "Celeste",
     pattern: "Profesiones",
-    tags: ["odontologia", "celeste", "dentistas", "estampado", "unisex"],
+    tags: ["odontologia", "celeste", "dentistas", "estampado", "mujer"],
     createdAt: "2025-03-20T12:00:00Z",
   },
   {
     id: 4,
     src: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=600&q=80",
-    alt: "Gorro Quirúrgico Unisex - Estampado Latidos del Corazón",
+    alt: "Hombre 02",
     category: "Hombres",
-    subcategory: "Gorro Unisex",
+    subcategory: "Gorros de Moño",
     color: "Negro",
     pattern: "Estampado",
-    tags: ["corazon", "electrocardiograma", "negro", "medico", "unisex"],
+    tags: ["corazon", "electrocardiograma", "negro", "medico", "hombre"],
     createdAt: "2025-04-25T12:00:00Z",
   },
   {
@@ -139,12 +139,12 @@ export const catalogImages: CatalogImage[] = [
   {
     id: 7,
     src: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=600&q=80",
-    alt: "Gorro Quirúrgico Unisex - Verde Quirófano Clásico",
+    alt: "Hombre 03",
     category: "Hombres",
-    subcategory: "Gorro Unisex",
+    subcategory: "Gorros de Moño",
     color: "Verde",
     pattern: "Liso",
-    tags: ["verde", "liso", "cirugia", "clasico", "unisex"],
+    tags: ["verde", "liso", "cirugia", "clasico", "hombre"],
     createdAt: "2026-06-15T12:00:00Z",
   }
 ];

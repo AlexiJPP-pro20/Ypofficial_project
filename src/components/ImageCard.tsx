@@ -1,8 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { BsWhatsapp, BsFire, BsLightningChargeFill } from 'react-icons/bs';
+import { BsWhatsapp, BsFire, BsLightningChargeFill, BsBagPlus } from 'react-icons/bs';
 import { CatalogImage } from '@/data/catalog';
+import { useCart } from '@/context/CartContext';
+import { calculatePricingMetrics } from '@/config/pricing';
+import { buildSingleItemWhatsAppUrl, formatBs, getCleanTitle } from '@/utils/whatsapp';
 
 type ImageCardProps = {
   image: CatalogImage;
@@ -15,74 +18,14 @@ type ImageCardProps = {
 export default function ImageCard({ image, priority = false, onOpenLightbox, isNew = false, bcvRate }: ImageCardProps) {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
+  const { addItem, updateQuantity, getItemQuantity } = useCart();
 
-  // Helper to construct absolute image URL if it's local
-  const getImageUrl = (src: string) => {
-    if (typeof window !== 'undefined' && src.startsWith('/')) {
-      return `${window.location.origin}${src}`;
-    }
-    return src;
-  };
-
-  // Helper to clean leading IDs/numbers from display title (e.g. "01 - Gorro" -> "Gorro")
-  const getCleanTitle = (alt: string) => {
-    const trimmed = alt.trim();
-    // Si es solo un número, no es un título real
-    if (/^\d+$/.test(trimmed)) {
-      return '';
-    }
-    // Si es un archivo temporal/genérico de WhatsApp
-    if (/^whatsapp\s+image/i.test(trimmed)) {
-      return '';
-    }
-    // Si empieza por IMG o IMAGE seguido de números o fechas
-    if (/^(img|image)[_\s-]*\d+/i.test(trimmed)) {
-      return '';
-    }
-
-    let clean = alt.replace(/^[\d\s\-_#]+/, '').trim();
-    
-    // Eliminar el sufijo hash de 6 caracteres alfanuméricos al final si aún existe
-    const words = clean.split(' ');
-    if (words.length > 1) {
-      const lastWord = words[words.length - 1];
-      if (/^[a-zA-Z0-9]{6}$/.test(lastWord) && lastWord.toLowerCase() !== 'unisex') {
-        words.pop();
-        clean = words.join(' ');
-      }
-    }
-    return clean;
-  };
+  const quantityInCart = getItemQuantity(image.id);
+  const { unitPriceUSD, wholesalePriceUSD, wholesaleMinUnits, discountPercent, promoActive } =
+    calculatePricingMetrics();
 
   const titleToDisplay = getCleanTitle(image.alt);
-
-  const formatBs = (value: number) => {
-    return value.toLocaleString('es-VE', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }) + ' Bs.';
-  };
-
-  // Helper to generate WhatsApp URL with custom pre-filled message
-  const getWhatsAppUrl = () => {
-    const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '584146430116';
-    const imgUrl = getImageUrl(image.src);
-    
-    const modelLine = titleToDisplay 
-      ? `- *Modelo:* ${titleToDisplay}` 
-      : `- *Código:* ${image.alt}`;
-
-    const priceLine = bcvRate
-      ? `- *Precio unitario:* $2.00 (${formatBs(2 * bcvRate)})\n- *Oferta (12+ uds - 25% OFF):* $1.50 c/u (${formatBs(1.5 * bcvRate)})`
-      : `- *Precio unitario:* $2.00\n- *Oferta (12+ uds - 25% OFF):* $1.50 c/u`;
-
-    const message = `¡Hola Ypofficial! Quisiera pedir esta prenda de su catálogo:
-${modelLine}
-${priceLine}
-- *Foto:* ${imgUrl}`;
-
-    return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-  };
+  const whatsappUrl = buildSingleItemWhatsAppUrl(image, bcvRate);
 
   return (
     <div className="image-card">
@@ -170,44 +113,80 @@ ${priceLine}
         {/* Price Section */}
         <div className="image-card__price-section" aria-label="Precio del gorro">
           <div className="image-card__price-row">
-            <span className="image-card__price-usd">$2.00</span>
+            <span className="image-card__price-usd">${unitPriceUSD.toFixed(2)}</span>
             <span className="image-card__price-unit">c/u</span>
             {bcvRate && (
-              <span className="image-card__price-bs">({formatBs(2 * bcvRate)})</span>
+              <span className="image-card__price-bs">({formatBs(unitPriceUSD * bcvRate)})</span>
             )}
           </div>
-          <div className="image-card__wholesale-badge">
-            <div className="image-card__wholesale-top">
-              <span className="image-card__wholesale-text">
-                <BsFire className="image-card__wholesale-icon" size={13} />
-                25% OFF (12+ UDS)
-              </span>
-              <span className="image-card__discount-tag">
-                <BsLightningChargeFill size={10} />
-                -25%
-              </span>
+          {promoActive && (
+            <div className="image-card__wholesale-badge">
+              <div className="image-card__wholesale-top">
+                <span className="image-card__wholesale-text">
+                  <BsFire className="image-card__wholesale-icon" size={13} />
+                  {discountPercent}% OFF ({wholesaleMinUnits}+ UDS)
+                </span>
+                <span className="image-card__discount-tag">
+                  <BsLightningChargeFill size={10} />
+                  -{discountPercent}%
+                </span>
+              </div>
+              <div className="image-card__wholesale-price">
+                <span>
+                  <span className="image-card__wholesale-old">${unitPriceUSD.toFixed(2)}</span>
+                  <strong>${wholesalePriceUSD.toFixed(2)} c/u</strong>
+                </span>
+                {bcvRate && (
+                  <span className="image-card__wholesale-bs">
+                    ({formatBs(wholesalePriceUSD * bcvRate)})
+                  </span>
+                )}
+              </div>
             </div>
-            <div className="image-card__wholesale-price">
-              <span>
-                <span className="image-card__wholesale-old">$2.00</span>
-                <strong>$1.50 c/u</strong>
-              </span>
-              {bcvRate && (
-                <span className="image-card__wholesale-bs">({formatBs(1.5 * bcvRate)})</span>
-              )}
-            </div>
-          </div>
+          )}
         </div>
 
-        <a
-          href={getWhatsAppUrl()}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="image-card__whatsapp-btn"
-        >
-          <BsWhatsapp className="image-card__whatsapp-icon" size={16} />
-          Pedir por WhatsApp
-        </a>
+        {/* Actions: Accumulator + Direct WhatsApp */}
+        <div className="image-card__actions">
+          {quantityInCart === 0 ? (
+            <button
+              type="button"
+              className="image-card__cart-btn"
+              onClick={() => addItem(image, 1)}
+            >
+              <BsBagPlus size={15} />
+              Añadir al pedido
+            </button>
+          ) : (
+            <div className="image-card__qty-control" aria-label="Cantidad en pedido">
+              <button
+                type="button"
+                onClick={() => updateQuantity(image.id, quantityInCart - 1)}
+                aria-label="Restar unidad"
+              >
+                -
+              </button>
+              <span>{quantityInCart} en pedido</span>
+              <button
+                type="button"
+                onClick={() => updateQuantity(image.id, quantityInCart + 1)}
+                aria-label="Sumar unidad"
+              >
+                +
+              </button>
+            </div>
+          )}
+
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="image-card__whatsapp-btn"
+          >
+            <BsWhatsapp className="image-card__whatsapp-icon" size={16} />
+            Pedir directo
+          </a>
+        </div>
       </div>
     </div>
   );
