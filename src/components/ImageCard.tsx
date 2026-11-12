@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { BsWhatsapp } from 'react-icons/bs';
+import { BsWhatsapp, BsFire, BsLightningChargeFill } from 'react-icons/bs';
 import { CatalogImage } from '@/data/catalog';
 
 type ImageCardProps = {
@@ -73,8 +73,8 @@ export default function ImageCard({ image, priority = false, onOpenLightbox, isN
       : `- *Código:* ${image.alt}`;
 
     const priceLine = bcvRate
-      ? `- *Precio:* $2.00 (${formatBs(2 * bcvRate)})`
-      : `- *Precio:* $2.00`;
+      ? `- *Precio unitario:* $2.00 (${formatBs(2 * bcvRate)})\n- *Oferta (12+ uds - 25% OFF):* $1.50 c/u (${formatBs(1.5 * bcvRate)})`
+      : `- *Precio unitario:* $2.00\n- *Oferta (12+ uds - 25% OFF):* $1.50 c/u`;
 
     const message = `¡Hola Ypofficial! Quisiera pedir esta prenda de su catálogo:
 ${modelLine}
@@ -167,12 +167,36 @@ ${priceLine}
           )}
         </div>
 
-        {/* Price Row */}
-        <div className="image-card__price-row" aria-label="Precio del gorro">
-          <span className="image-card__price-usd">$2.00</span>
-          {bcvRate && (
-            <span className="image-card__price-bs">{formatBs(2 * bcvRate)}</span>
-          )}
+        {/* Price Section */}
+        <div className="image-card__price-section" aria-label="Precio del gorro">
+          <div className="image-card__price-row">
+            <span className="image-card__price-usd">$2.00</span>
+            <span className="image-card__price-unit">c/u</span>
+            {bcvRate && (
+              <span className="image-card__price-bs">({formatBs(2 * bcvRate)})</span>
+            )}
+          </div>
+          <div className="image-card__wholesale-badge">
+            <div className="image-card__wholesale-top">
+              <span className="image-card__wholesale-text">
+                <BsFire className="image-card__wholesale-icon" size={13} />
+                25% OFF (12+ UDS)
+              </span>
+              <span className="image-card__discount-tag">
+                <BsLightningChargeFill size={10} />
+                -25%
+              </span>
+            </div>
+            <div className="image-card__wholesale-price">
+              <span>
+                <span className="image-card__wholesale-old">$2.00</span>
+                <strong>$1.50 c/u</strong>
+              </span>
+              {bcvRate && (
+                <span className="image-card__wholesale-bs">({formatBs(1.5 * bcvRate)})</span>
+              )}
+            </div>
+          </div>
         </div>
 
         <a

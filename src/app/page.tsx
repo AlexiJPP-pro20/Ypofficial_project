@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import FilterPanel from '@/components/FilterPanel';
 import ImageCard from '@/components/ImageCard';
-import { BsWhatsapp } from 'react-icons/bs';
+import { BsWhatsapp, BsFire, BsLightningChargeFill, BsPercent, BsStars } from 'react-icons/bs';
 import {
   catalogImages as fallbackImages,
   CATEGORIES,
@@ -177,6 +177,22 @@ export default function Home() {
 
   return (
     <>
+      {/* ====== TOP PROMO BAR ====== */}
+      <div className="top-bar" role="region" aria-label="Oferta especial">
+        <div className="top-bar__inner">
+          <span className="top-bar__promo-pill">
+            <BsFire size={13} />
+            25% OFF
+          </span>
+          <span className="top-bar__promo-text">
+            <BsStars className="top-bar__icon" size={15} />
+            25% DE DESCUENTO A PARTIR DE 12 UNIDADES: DE $2.00 A $1.50 C/U
+            {bcvRate ? ` (${formatBs(1.5 * bcvRate)})` : ''}
+            <BsLightningChargeFill className="top-bar__icon" size={14} />
+          </span>
+        </div>
+      </div>
+
       {/* ====== HEADER ====== */}
       <header className="header">
         <div className="header__inner">
@@ -248,6 +264,25 @@ export default function Home() {
             Explora nuestra colección de gorros para damas y caballeros.
             Cómodos, lavables y con diseños exclusivos para profesionales de la salud.
           </p>
+          <div className="hero__promo-banner">
+            <span className="hero__promo-ribbon">
+              <BsFire size={13} />
+              OFERTA MAYORISTA EXCLUSIVA
+              <BsLightningChargeFill size={13} />
+            </span>
+            <span className="hero__promo-highlight">
+              <BsStars className="hero__promo-icon" size={20} />
+              25% DE DESCUENTO A PARTIR DE 12 UNIDADES
+              <BsPercent className="hero__promo-icon" size={20} />
+            </span>
+            <div className="hero__promo-details">
+              <span>De <span className="hero__promo-old-price">$2.00 c/u</span> a</span>
+              <span className="hero__promo-new-price">$1.50 c/u</span>
+              {bcvRate && (
+                <span className="hero__promo-bs">({formatBs(1.5 * bcvRate)})</span>
+              )}
+            </div>
+          </div>
           <div className="hero__actions">
             <a
               href="https://wa.me/584146430116?text=Hola%20YP%20Modas%2C%20quisiera%20m%C3%A1s%20informaci%C3%B3n%20sobre%20los%20gorros%20quir%C3%BArgicos."
@@ -492,8 +527,8 @@ export default function Home() {
           : `- *Código:* ${selectedImage.alt}`;
 
         const priceLine = bcvRate
-          ? `- *Precio:* $2.00 (${formatBs(2 * bcvRate)})`
-          : `- *Precio:* $2.00`;
+          ? `- *Precio unitario:* $2.00 (${formatBs(2 * bcvRate)})\n- *Oferta (12+ uds - 25% OFF):* $1.50 c/u (${formatBs(1.5 * bcvRate)})`
+          : `- *Precio unitario:* $2.00\n- *Oferta (12+ uds - 25% OFF):* $1.50 c/u`;
 
         const message = `¡Hola Ypofficial! Quisiera pedir esta prenda de su catálogo:
 ${modelLine}
@@ -552,12 +587,32 @@ ${priceLine}
 
                 {/* Price display in Lightbox */}
                 <div className="lightbox__price-container">
-                  <span className="lightbox__price-label">Precio:</span>
-                  <div className="lightbox__price-values">
-                    <span className="lightbox__price-usd">$2.00 USD</span>
-                    {bcvRate && (
-                      <span className="lightbox__price-bs">({formatBs(2 * bcvRate)})</span>
-                    )}
+                  <div className="lightbox__price-tier">
+                    <span className="lightbox__price-label">Precio Unitario:</span>
+                    <div className="lightbox__price-values">
+                      <span className="lightbox__price-usd">$2.00 USD c/u</span>
+                      {bcvRate && (
+                        <span className="lightbox__price-bs">({formatBs(2 * bcvRate)})</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="lightbox__price-tier lightbox__price-tier--wholesale">
+                    <div className="lightbox__wholesale-header">
+                      <span className="lightbox__price-label">
+                        <BsFire size={15} />
+                        25% de descuento a partir de 12 unidades:
+                      </span>
+                      <span className="lightbox__discount-badge">
+                        <BsLightningChargeFill size={11} />
+                        -25% OFF
+                      </span>
+                    </div>
+                    <div className="lightbox__price-values">
+                      <span className="lightbox__price-usd lightbox__price-usd--promo">$1.50 USD c/u</span>
+                      {bcvRate && (
+                        <span className="lightbox__price-bs">({formatBs(1.5 * bcvRate)})</span>
+                      )}
+                    </div>
                   </div>
                 </div>
 

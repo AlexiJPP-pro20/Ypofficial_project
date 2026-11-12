@@ -3,7 +3,7 @@
    Paleta extraída del logo oficial de YP
    ===================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;0,800;0,900;1,800&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
 @import url('https://fonts.cdnfonts.com/css/lovelo');
 
 /* === TOKENS === */
@@ -26,6 +26,13 @@
   --teal-main:      #4A9B9E;
   --teal-light:     #7BBFC0;
   --teal-pale:      #D4EEEF;
+
+  /* Dorado promocional */
+  --gold-bright:    #FFD700;
+  --gold-light:     #FFF3B0;
+  --gold-rich:      #F5B041;
+  --gold-dark:      #B8860B;
+  --gold-bg-dark:   #240E35;
 
   /* Neutros */
   --cream:          #FBF8F5;
@@ -52,6 +59,7 @@
   /* Tipografía */
   --font-sans:      var(--font-poppins), 'Poppins', sans-serif;
   --font-display:   'Lovelo', var(--font-poppins), 'Poppins', sans-serif;
+  --font-promo:     'Montserrat', 'Lovelo', var(--font-poppins), sans-serif;
 
   /* Transiciones */
   --ease:           cubic-bezier(0.4, 0, 0.2, 1);
@@ -1723,17 +1731,41 @@ img {
 }
 
 /* === TOP ANNOUNCEMENT BAR === */
+@keyframes goldShimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes goldPulse {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45), 0 0 18px rgba(255, 215, 0, 0.35), inset 0 0 12px rgba(255, 215, 0, 0.12);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 6px 28px rgba(0, 0, 0, 0.55), 0 0 32px rgba(255, 215, 0, 0.65), inset 0 0 18px rgba(255, 215, 0, 0.22);
+    transform: scale(1.015);
+  }
+}
+
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+  50% { transform: translateY(-2px) rotate(-8deg) scale(1.12); }
+}
+
 .top-bar {
-  background: linear-gradient(90deg, var(--purple-deep) 0%, var(--purple-main) 50%, var(--pink-main) 100%);
-  color: var(--white);
-  font-size: 13px;
-  font-weight: 500;
-  padding: 8px 24px;
+  background: linear-gradient(90deg, #12041C 0%, #2E0F46 30%, #4A196E 50%, #2E0F46 70%, #12041C 100%);
+  color: var(--gold-bright);
+  font-family: var(--font-promo);
+  font-size: 13.5px;
+  font-weight: 800;
+  padding: 10px 24px;
   text-align: center;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  border-bottom: 2px solid var(--gold-bright);
   position: relative;
   z-index: 101;
-  transition: all var(--duration-base) var(--ease);
+  letter-spacing: 0.6px;
+  overflow: hidden;
 }
 
 .top-bar__inner {
@@ -1746,57 +1778,358 @@ img {
   flex-wrap: wrap;
 }
 
-.top-bar__divider {
-  opacity: 0.4;
+.top-bar__icon {
+  color: var(--gold-bright);
+  filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.8));
+  animation: iconFloat 2s ease-in-out infinite;
+  flex-shrink: 0;
 }
 
-.top-bar__rate-badge {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  padding: 2px 8px;
+.top-bar__promo-text {
+  background: linear-gradient(
+    90deg,
+    #FFE57F 0%,
+    #FFD700 25%,
+    #FFFDF0 50%,
+    #FFD700 75%,
+    #F5B041 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: goldShimmer 4s linear infinite;
+  font-family: var(--font-promo);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.top-bar__promo-pill {
+  background: linear-gradient(135deg, #FFF3B0 0%, #FFD700 50%, #F39C12 100%);
+  color: #160522;
+  padding: 3px 12px;
   border-radius: var(--radius-full);
+  font-family: var(--font-promo);
+  font-size: 11.5px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.65);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* === HERO PROMO BANNER === */
+.hero__promo-banner {
+  margin: 24px auto 4px;
+  max-width: 600px;
+  background: linear-gradient(135deg, rgba(20, 5, 32, 0.95) 0%, rgba(56, 17, 84, 0.96) 50%, rgba(20, 5, 32, 0.95) 100%);
+  border: 2px solid var(--gold-bright);
+  border-radius: var(--radius-lg);
+  padding: 16px 24px;
+  animation: goldPulse 3s ease-in-out infinite;
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero__promo-ribbon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #FFF3B0 0%, #FFD700 50%, #F39C12 100%);
+  color: #160522;
+  font-family: var(--font-promo);
   font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 2px 12px rgba(255, 215, 0, 0.5);
+}
+
+.hero__promo-highlight {
+  font-family: var(--font-promo);
+  font-size: clamp(16px, 2.8vw, 22px);
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  background: linear-gradient(
+    90deg,
+    #FFF3B0 0%,
+    #FFD700 30%,
+    #FFFFFF 50%,
+    #FFD700 70%,
+    #F5B041 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: goldShimmer 3.5s linear infinite;
+  filter: drop-shadow(0 2px 10px rgba(255, 215, 0, 0.4));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.hero__promo-icon {
+  color: var(--gold-bright);
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.85));
+  flex-shrink: 0;
+  animation: iconFloat 2.2s ease-in-out infinite;
+}
+
+.hero__promo-details {
+  font-family: var(--font-promo);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gold-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hero__promo-old-price {
+  text-decoration: line-through;
+  color: rgba(255, 255, 255, 0.65);
   font-weight: 600;
+  font-size: 14px;
+}
+
+.hero__promo-new-price {
+  background: rgba(255, 215, 0, 0.16);
+  border: 1px solid var(--gold-bright);
+  color: var(--gold-bright);
+  font-family: var(--font-promo);
+  font-weight: 900;
+  font-size: 18px;
+  padding: 2px 12px;
+  border-radius: var(--radius-sm);
+  text-shadow: 0 0 12px rgba(255, 215, 0, 0.55);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.25);
+}
+
+.hero__promo-bs {
+  font-size: 13px;
+  color: var(--gold-light);
+  font-weight: 700;
 }
 
 /* === CARD PRICE STYLES === */
-.image-card__price-row {
+.image-card__price-section {
   display: flex;
-  align-items: baseline;
+  flex-direction: column;
   gap: 8px;
   margin-top: -4px;
 }
 
+.image-card__price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
 .image-card__price-usd {
+  font-family: var(--font-promo);
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--purple-deep);
 }
 
+.image-card__price-unit {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-mid);
+}
+
 .image-card__price-bs {
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--text-light);
   font-weight: 500;
+}
+
+.image-card__wholesale-badge {
+  background: linear-gradient(135deg, #160522 0%, #34114D 55%, #1D082B 100%);
+  border: 1.5px solid var(--gold-bright);
+  border-radius: var(--radius-sm);
+  padding: 9px 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  box-shadow: 0 3px 14px rgba(255, 215, 0, 0.25), inset 0 0 8px rgba(255, 215, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--duration-fast) var(--ease), box-shadow var(--duration-fast) var(--ease);
+}
+
+.image-card:hover .image-card__wholesale-badge {
+  box-shadow: 0 4px 18px rgba(255, 215, 0, 0.45), inset 0 0 12px rgba(255, 215, 0, 0.18);
+  transform: scale(1.01);
+}
+
+.image-card__wholesale-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.image-card__discount-tag {
+  background: linear-gradient(135deg, #FFF3B0 0%, #FFD700 50%, #F39C12 100%);
+  color: #160522;
+  font-family: var(--font-promo);
+  font-size: 10.5px;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 5px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+}
+
+.image-card__wholesale-text {
+  font-family: var(--font-promo);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+  letter-spacing: 0.4px;
+  text-shadow: 0 1px 8px rgba(255, 215, 0, 0.35);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.image-card__wholesale-icon {
+  color: var(--gold-bright);
+  filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.75));
+  flex-shrink: 0;
+}
+
+.image-card__wholesale-price {
+  font-family: var(--font-promo);
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--gold-light);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px;
+  border-top: 1px solid rgba(255, 215, 0, 0.22);
+  padding-top: 4px;
+}
+
+.image-card__wholesale-price strong {
+  color: var(--gold-bright);
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.45);
+}
+
+.image-card__wholesale-old {
+  text-decoration: line-through;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 11.5px;
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.image-card__wholesale-bs {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold-light);
 }
 
 /* === LIGHTBOX PRICE STYLES === */
 .lightbox__price-container {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 10px;
-  background: var(--purple-pale);
-  border: 1px solid var(--border);
-  padding: 12px 18px;
-  border-radius: var(--radius-md);
   margin-top: 4px;
 }
 
+.lightbox__price-tier {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--purple-pale);
+  border: 1px solid var(--border);
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  flex-wrap: wrap;
+}
+
+.lightbox__price-tier--wholesale {
+  background: linear-gradient(135deg, #160522 0%, #34114D 55%, #1D082B 100%);
+  border: 2px solid var(--gold-bright);
+  box-shadow: 0 6px 22px rgba(255, 215, 0, 0.3), inset 0 0 12px rgba(255, 215, 0, 0.12);
+  padding: 14px 16px;
+}
+
+.lightbox__wholesale-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .lightbox__price-label {
-  font-size: 13px;
-  font-weight: 700;
+  font-family: var(--font-promo);
+  font-size: 12px;
+  font-weight: 800;
   color: var(--purple-deep);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lightbox__price-tier--wholesale .lightbox__price-label {
+  color: var(--gold-bright);
+  text-shadow: 0 1px 10px rgba(255, 215, 0, 0.45);
+  font-size: 13px;
+}
+
+.lightbox__discount-badge {
+  background: linear-gradient(135deg, #FFF3B0 0%, #FFD700 50%, #F39C12 100%);
+  color: #160522;
+  font-family: var(--font-promo);
+  font-size: 11px;
+  font-weight: 900;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.55);
 }
 
 .lightbox__price-values {
@@ -1806,24 +2139,51 @@ img {
 }
 
 .lightbox__price-usd {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--pink-hot);
+  font-family: var(--font-promo);
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--purple-deep);
+}
+
+.lightbox__price-usd--promo {
+  font-family: var(--font-promo);
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--gold-bright);
+  text-shadow: 0 0 14px rgba(255, 215, 0, 0.55);
 }
 
 .lightbox__price-bs {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-mid);
   font-weight: 600;
+}
+
+.lightbox__price-tier--wholesale .lightbox__price-bs {
+  color: var(--gold-light);
+  font-weight: 700;
 }
 
 @media (max-width: 600px) {
   .top-bar {
     font-size: 11px;
-    padding: 6px 12px;
+    padding: 8px 10px;
   }
-  .top-bar__rate-badge {
+  .top-bar__promo-pill {
     font-size: 10px;
+    padding: 2px 8px;
+  }
+  .hero__promo-banner {
+    padding: 12px 14px;
+  }
+  .hero__promo-highlight {
+    font-size: 14px;
+  }
+  .hero__promo-details {
+    font-size: 13px;
+  }
+  .hero__promo-new-price {
+    font-size: 15px;
   }
 }
 
