@@ -7,7 +7,16 @@ import OrderSummaryBar from '@/components/OrderSummaryBar';
 import { useCart } from '@/context/CartContext';
 import { calculatePricingMetrics } from '@/config/pricing';
 import { buildSingleItemWhatsAppUrl, formatBs, getCleanTitle } from '@/utils/whatsapp';
-import { BsWhatsapp, BsFire, BsLightningChargeFill, BsPercent, BsStars, BsBagPlus } from 'react-icons/bs';
+import {
+  BsWhatsapp,
+  BsFire,
+  BsLightningChargeFill,
+  BsPercent,
+  BsStars,
+  BsBagPlus,
+  BsChevronLeft,
+  BsChevronRight,
+} from 'react-icons/bs';
 import {
   catalogImages as fallbackImages,
   CATEGORIES,
@@ -28,6 +37,57 @@ const DEFAULT_FILTERS: Filters = {
   subcategory: 'Todos',
 };
 
+const HERO_SLIDES = [
+  {
+    id: 1,
+    image: '/Hero-1.jpg',
+    badge: 'Colección Quirúrgica 2025',
+    title: (
+      <>
+        Gorros <em>Quirúrgicos</em><br />de Alta Calidad
+      </>
+    ),
+    description:
+      'Explora nuestra colección de gorros para damas y caballeros. Cómodos, lavables y con diseños exclusivos para profesionales de la salud.',
+  },
+  {
+    id: 2,
+    image: '/Hero-2.jpg',
+    badge: '100% Confección Nacional',
+    title: (
+      <>
+        Diseños <em>Exclusivos</em><br />y Ergonómicos
+      </>
+    ),
+    description:
+      'Confeccionados con telas de primera calidad para brindar frescura, durabilidad y máxima comodidad durante tus jornadas.',
+  },
+  {
+    id: 3,
+    image: '/Hero-3.jpg',
+    badge: 'Descuentos al Mayor',
+    title: (
+      <>
+        Precios <em>Especiales</em><br />para Equipos Médicos
+      </>
+    ),
+    description:
+      'Aprovecha descuentos a partir de 6 unidades con envíos a toda Venezuela. Calidad y distinción para tu clínica o personal.',
+  },
+  {
+    id: 4,
+    image: '/Hero-4.jpg',
+    badge: 'Ajuste Anatómico',
+    title: (
+      <>
+        Estilo y <em>Protección</em><br />en Cada Detalle
+      </>
+    ),
+    description:
+      'Modelos anatómicos con ajuste perfecto y variedad de estampados modernos pensados para destacar en el quirófano.',
+  },
+];
+
 export default function Home() {
   const { totalUnits, addItem, updateQuantity, getItemQuantity } = useCart();
   const pricing = calculatePricingMetrics();
@@ -41,6 +101,47 @@ export default function Home() {
   const [sortBy, setSortBy] = useState<'recent' | 'category'>('recent');
   const [bcvRate, setBcvRate] = useState<number | null>(null);
   const [loadingRate, setLoadingRate] = useState(true);
+
+  // Hero carousel state
+  const [currentHeroSlide, setCurrentHeroSlide] = useState(0);
+  const [isHeroPaused, setIsHeroPaused] = useState(false);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchEndX, setTouchEndX] = useState<number | null>(null);
+
+  const nextHeroSlide = useCallback(() => {
+    setCurrentHeroSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+  }, []);
+
+  const prevHeroSlide = useCallback(() => {
+    setCurrentHeroSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+  }, []);
+
+  useEffect(() => {
+    if (isHeroPaused) return;
+    const interval = setInterval(nextHeroSlide, 5000);
+    return () => clearInterval(interval);
+  }, [isHeroPaused, nextHeroSlide]);
+
+  const handleHeroTouchStart = (e: React.TouchEvent) => {
+    setTouchEndX(null);
+    setTouchStartX(e.targetTouches[0].clientX);
+  };
+
+  const handleHeroTouchMove = (e: React.TouchEvent) => {
+    setTouchEndX(e.targetTouches[0].clientX);
+  };
+
+  const handleHeroTouchEnd = () => {
+    if (touchStartX === null || touchEndX === null) return;
+    const distance = touchStartX - touchEndX;
+    if (distance > 45) {
+      nextHeroSlide();
+    } else if (distance < -45) {
+      prevHeroSlide();
+    }
+    setTouchStartX(null);
+    setTouchEndX(null);
+  };
 
   // Close lightbox on Escape key press and toggle body scroll lock
   useEffect(() => {
@@ -244,27 +345,71 @@ export default function Home() {
         </div>
       </header>
 
-      {/* ====== HERO ====== */}
-      <section className="hero">
-        <div className="hero__bg" aria-hidden="true">
-          <img src="/Hero.jpg" alt="" className="hero__bg-img" />
-          <div className="hero__bg-overlay" />
-          <div className="hero__bg-fade" />
+      {/* ====== HERO CAROUSEL ====== */}
+      <section
+        className="hero"
+        onMouseEnter={() => setIsHeroPaused(true)}
+        onMouseLeave={() => setIsHeroPaused(false)}
+        onTouchStart={handleHeroTouchStart}
+        onTouchMove={handleHeroTouchMove}
+        onTouchEnd={handleHeroTouchEnd}
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="Colección y promociones destacadas"
+      >
+        {/* Background carousel slides with crossfade */}
+        <div className="hero__bg-carousel" aria-hidden="true">
+          {HERO_SLIDES.map((slide, idx) => (
+            <div
+              key={slide.id}
+              className={`hero__bg-slide ${idx === currentHeroSlide ? 'active' : ''}`}
+            >
+              <img
+                src={slide.image}
+                alt=""
+                className="hero__bg-img"
+                loading={idx === 0 ? 'eager' : 'lazy'}
+              />
+              <div className="hero__bg-overlay" />
+              <div className="hero__bg-fade" />
+            </div>
+          ))}
         </div>
+
+        {/* Carousel Navigation Arrows */}
+        <button
+          type="button"
+          className="hero__nav-btn hero__nav-btn--prev"
+          onClick={prevHeroSlide}
+          aria-label="Diapositiva anterior"
+        >
+          <BsChevronLeft size={22} />
+        </button>
+        <button
+          type="button"
+          className="hero__nav-btn hero__nav-btn--next"
+          onClick={nextHeroSlide}
+          aria-label="Diapositiva siguiente"
+        >
+          <BsChevronRight size={22} />
+        </button>
+
         <div className="hero__inner">
-          <div className="hero__badge">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-            </svg>
-            Colección Quirúrgica 2025
+          <div className="hero__slide-content" key={currentHeroSlide}>
+            <div className="hero__badge">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+              {HERO_SLIDES[currentHeroSlide].badge}
+            </div>
+            <h1 className="hero__title">
+              {HERO_SLIDES[currentHeroSlide].title}
+            </h1>
+            <p className="hero__description">
+              {HERO_SLIDES[currentHeroSlide].description}
+            </p>
           </div>
-          <h1 className="hero__title">
-            Gorros <em>Quirúrgicos</em><br />de Alta Calidad
-          </h1>
-          <p className="hero__description">
-            Explora nuestra colección de gorros para damas y caballeros.
-            Cómodos, lavables y con diseños exclusivos para profesionales de la salud.
-          </p>
+
           {pricing.promoActive && (
             <div className="hero__promo-banner">
               <span className="hero__promo-ribbon">
@@ -286,6 +431,7 @@ export default function Home() {
               </div>
             </div>
           )}
+
           <div className="hero__actions">
             <a
               href="https://wa.me/584146430116?text=Hola%20YP%20Modas%2C%20quisiera%20m%C3%A1s%20informaci%C3%B3n%20sobre%20los%20gorros%20quir%C3%BArgicos."
@@ -297,6 +443,21 @@ export default function Home() {
               <BsWhatsapp size={20} />
               <span>Contactanos!</span>
             </a>
+          </div>
+
+          {/* Carousel Pagination Dots */}
+          <div className="hero__dots" role="tablist" aria-label="Navegación del carrusel">
+            {HERO_SLIDES.map((slide, idx) => (
+              <button
+                key={slide.id}
+                type="button"
+                role="tab"
+                aria-selected={idx === currentHeroSlide}
+                className={`hero__dot ${idx === currentHeroSlide ? 'active' : ''}`}
+                onClick={() => setCurrentHeroSlide(idx)}
+                aria-label={`Ir a diapositiva ${idx + 1}: ${slide.badge}`}
+              />
+            ))}
           </div>
         </div>
       </section>
