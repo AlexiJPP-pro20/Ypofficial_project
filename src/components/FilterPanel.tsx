@@ -99,8 +99,8 @@ export default function FilterPanel({
         </div>
       </div>
 
-      {/* Subcategory: se oculta si solo existe un único modelo disponible */}
-      {availableSubcategories && availableSubcategories.filter((s) => s !== 'Todos').length > 1 && (
+      {/* Subcategory */}
+      {availableSubcategories && availableSubcategories.length > 0 && (
         <div className="filter-section">
           <div className="filter-section__label">Modelo / Tipo</div>
           <div className="filter-options">

@@ -1085,7 +1085,7 @@ img {
   position: fixed;
   inset: 0;
   background: rgba(45, 27, 53, 0.5);
-  z-index: 200;
+  z-index: 1040;
   backdrop-filter: blur(4px);
 }
 
@@ -1100,12 +1100,83 @@ img {
   bottom: 0;
   width: min(290px, 85vw);
   background: var(--cream);
-  z-index: 201;
+  z-index: 1050;
   overflow-y: auto;
   transform: translateX(-100%);
   transition: transform var(--duration-base) var(--ease);
   padding: 20px;
   box-shadow: var(--shadow-lg);
+}
+
+/* === MOBILE CATEGORY PILLS BAR === */
+.mobile-category-bar {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .mobile-category-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 2px 2px 12px;
+    margin-bottom: 12px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .mobile-category-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-category-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 8px 14px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dark);
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all var(--duration-fast) var(--ease);
+  }
+
+  .mobile-category-pill:hover {
+    border-color: var(--purple-light);
+    background: var(--purple-pale);
+  }
+
+  .mobile-category-pill.active {
+    background: var(--purple-main);
+    border-color: var(--purple-main);
+    color: var(--white);
+    box-shadow: 0 2px 8px rgba(123, 63, 160, 0.25);
+  }
+
+  .mobile-category-pill__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: var(--radius-full);
+    font-size: 10.5px;
+    font-weight: 700;
+    background: rgba(123, 63, 160, 0.12);
+    color: var(--purple-deep);
+  }
+
+  .mobile-category-pill.active .mobile-category-pill__count {
+    background: rgba(255, 255, 255, 0.25);
+    color: var(--white);
+  }
 }
 
 .mobile-sidebar.open {
@@ -1226,12 +1297,14 @@ img {
 
   .header__cta {
     order: 3;
-    padding: 8px;
-    border-radius: 50%;
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
+    gap: 6px;
+    font-size: 12px;
   }
 
   .header__cta span {
-    display: none;
+    display: inline;
   }
 
   .header__search {
@@ -1367,11 +1440,38 @@ img {
     font-size: 11px;
   }
 
-  .image-card__whatsapp-btn {
-    padding: 8px 10px;
-    font-size: 11px;
+  .image-card__actions {
     gap: 6px;
+  }
+
+  .image-card__cart-btn {
+    padding: 7px 8px;
+    font-size: 11px;
+    gap: 5px;
     border-radius: var(--radius-sm);
+    width: 100%;
+    white-space: nowrap;
+  }
+
+  .image-card__qty-control {
+    padding: 3px 6px;
+    font-size: 11px;
+    border-radius: var(--radius-sm);
+  }
+
+  .image-card__qty-control button {
+    width: 24px;
+    height: 24px;
+    font-size: 13px;
+  }
+
+  .image-card__whatsapp-btn {
+    padding: 7px 8px;
+    font-size: 11px;
+    gap: 5px;
+    border-radius: var(--radius-sm);
+    width: 100%;
+    white-space: nowrap;
   }
 
   .image-card__whatsapp-icon {
@@ -2598,22 +2698,63 @@ img {
 
 @media (max-width: 600px) {
   .order-bar__inner {
-    padding: 10px 14px;
-    gap: 10px;
+    padding: 10px 12px;
+    gap: 8px;
   }
   .order-bar__left {
     width: 100%;
+    display: flex;
+    align-items: center;
     justify-content: space-between;
+    gap: 8px;
   }
   .order-bar__right {
     width: 100%;
-    justify-content: space-between;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
   }
   .order-bar__totals {
-    align-items: flex-start;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed rgba(155, 93, 184, 0.25);
+  }
+  .order-bar--wholesale .order-bar__totals {
+    border-bottom-color: rgba(255, 215, 0, 0.3);
+  }
+  .order-bar__invoice-btn {
+    flex: 1 1 calc(50% - 4px);
+    justify-content: center;
+    padding: 9px 8px;
+    font-size: 12px;
+    gap: 5px;
+    white-space: nowrap;
+  }
+  .order-bar__cta {
+    flex: 1 1 calc(50% - 4px);
+    justify-content: center;
+    padding: 9px 8px;
+    font-size: 12px;
+    gap: 5px;
+    white-space: nowrap;
   }
   .floating-whatsapp--shifted {
-    bottom: 124px;
+    bottom: 130px;
+  }
+}
+
+/* Padding to prevent floating order bar from obscuring content/buttons */
+.main--has-order-bar {
+  padding-bottom: 110px;
+}
+@media (max-width: 600px) {
+  .main--has-order-bar {
+    padding-bottom: 150px;
   }
 }
 
@@ -2919,6 +3060,18 @@ img {
 .invoice-btn--whatsapp {
   background: #25D366;
   color: var(--white);
+}
+
+@media (max-width: 600px) {
+  .invoice-modal__actions {
+    padding: 12px 14px 18px;
+    gap: 8px;
+    flex-direction: column;
+  }
+  .invoice-modal__actions .invoice-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 @media print {

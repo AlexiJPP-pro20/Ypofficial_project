@@ -302,7 +302,7 @@ export default function Home() {
       </section>
 
       {/* ====== MAIN CONTENT ====== */}
-      <main className="main">
+      <main className={`main ${totalUnits > 0 ? 'main--has-order-bar' : ''}`}>
         {/* Desktop Sidebar */}
         <aside className="sidebar">
           <FilterPanel
@@ -338,6 +338,32 @@ export default function Home() {
 
         {/* Catalog section */}
         <section className="catalog">
+          {/* Mobile Category Quick Filter Buttons */}
+          <div className="mobile-category-bar" role="navigation" aria-label="Categorías rápidas">
+            {CATEGORIES.map((cat) => {
+              const count = images.filter((img) => cat === 'Todos' || img.category === cat).length;
+              const isActive = filters.category === cat;
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  className={`mobile-category-pill ${isActive ? 'active' : ''}`}
+                  onClick={() => {
+                    handleFilterChange('category', cat);
+                    const nextSubs = SUBCATEGORIES[cat] || [];
+                    if (!nextSubs.includes(filters.subcategory)) {
+                      handleFilterChange('subcategory', 'Todos');
+                    }
+                  }}
+                  aria-pressed={isActive}
+                >
+                  <span className="mobile-category-pill__name">{cat}</span>
+                  <span className="mobile-category-pill__count">{count}</span>
+                </button>
+              );
+            })}
+          </div>
+
           {/* Toolbar */}
           <div className="catalog__toolbar">
             <div className="catalog__toolbar-left">
