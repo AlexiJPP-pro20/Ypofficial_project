@@ -102,9 +102,8 @@ export default function Home() {
   const [bcvRate, setBcvRate] = useState<number | null>(null);
   const [loadingRate, setLoadingRate] = useState(true);
 
-  // Hero carousel state
+  // Hero carousel state (continuous autoplay every 4s)
   const [currentHeroSlide, setCurrentHeroSlide] = useState(0);
-  const [isHeroPaused, setIsHeroPaused] = useState(false);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchEndX, setTouchEndX] = useState<number | null>(null);
 
@@ -117,10 +116,9 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (isHeroPaused) return;
-    const interval = setInterval(nextHeroSlide, 5000);
-    return () => clearInterval(interval);
-  }, [isHeroPaused, nextHeroSlide]);
+    const timer = setTimeout(nextHeroSlide, 4000);
+    return () => clearTimeout(timer);
+  }, [currentHeroSlide, nextHeroSlide]);
 
   const handleHeroTouchStart = (e: React.TouchEvent) => {
     setTouchEndX(null);
@@ -348,8 +346,6 @@ export default function Home() {
       {/* ====== HERO CAROUSEL ====== */}
       <section
         className="hero"
-        onMouseEnter={() => setIsHeroPaused(true)}
-        onMouseLeave={() => setIsHeroPaused(false)}
         onTouchStart={handleHeroTouchStart}
         onTouchMove={handleHeroTouchMove}
         onTouchEnd={handleHeroTouchEnd}
@@ -368,7 +364,7 @@ export default function Home() {
                 src={slide.image}
                 alt=""
                 className="hero__bg-img"
-                loading={idx === 0 ? 'eager' : 'lazy'}
+                loading="eager"
               />
               <div className="hero__bg-overlay" />
               <div className="hero__bg-fade" />
