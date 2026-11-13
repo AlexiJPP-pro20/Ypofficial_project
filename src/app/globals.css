@@ -841,20 +841,44 @@ img {
   background: var(--purple-main);
 }
 
-/* === IMAGE GRID === */
+/* === IMAGE GRID (SYMMETRICAL) === */
 .image-grid {
-  columns: 4;
-  column-gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
 }
 
-@media (max-width: 1200px) { .image-grid { columns: 3; } }
-@media (max-width: 900px)  { .image-grid { columns: 2; column-gap: 12px; } }
-@media (max-width: 380px)  { .image-grid { columns: 1; } }
+.image-grid > [role="listitem"] {
+  display: flex;
+}
+
+@media (max-width: 1200px) {
+  .image-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .image-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .image-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
 /* === IMAGE CARD === */
 .image-card {
-  break-inside: avoid;
-  margin-bottom: 16px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
   border-radius: var(--radius-md);
   overflow: hidden;
   background: var(--white);
@@ -875,12 +899,20 @@ img {
 
 .image-card__img-wrapper {
   width: 100%;
+  aspect-ratio: 4 / 5;
   overflow: hidden;
   position: relative;
   background: var(--cream-dark);
   cursor: pointer;
+  flex-shrink: 0;
   transition: transform var(--duration-fast) var(--ease),
               filter var(--duration-fast) var(--ease);
+}
+
+.image-card__img-wrapper .image-skeleton {
+  height: 100% !important;
+  margin-bottom: 0;
+  border-radius: 0;
 }
 
 .image-card__img-wrapper::after {
@@ -903,11 +935,12 @@ img {
 
 .image-card__img {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
   transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
               filter var(--duration-base) var(--ease);
   object-fit: cover;
+  object-position: center;
   will-change: transform;
 }
 
@@ -961,6 +994,7 @@ img {
   padding: 16px;
   display: flex;
   flex-direction: column;
+  flex: 1;
   gap: 14px;
   background: var(--white);
   border-top: 1px solid var(--border);
@@ -1050,8 +1084,6 @@ img {
 
 /* === SKELETON LOADER === */
 .image-skeleton {
-  break-inside: avoid;
-  margin-bottom: 16px;
   border-radius: var(--radius-md);
   overflow: hidden;
   background: var(--cream-dark);
@@ -1556,7 +1588,7 @@ img {
 
   /* Compact cards for 2-column mobile grid */
   .image-card {
-    margin-bottom: 12px;
+    margin-bottom: 0;
   }
 
   .image-card__badge,
@@ -2459,6 +2491,7 @@ img {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-top: auto;
 }
 
 .image-card__cart-btn {
